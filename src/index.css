@@ -1,13 +1,123 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f3f7f3;
+}
+
+/* Topographic contour background pattern — green-tinted */
+.ftf-topo-bg {
+  position: relative;
+}
+
+.ftf-topo-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.02;
+  pointer-events: none;
+  background-image:
+    repeating-radial-gradient(
+      ellipse at 20% 50%,
+      transparent,
+      transparent 60px,
+      #143a1a 61px,
+      transparent 62px
+    ),
+    repeating-radial-gradient(
+      ellipse at 80% 30%,
+      transparent,
+      transparent 80px,
+      #143a1a 81px,
+      transparent 82px
+    ),
+    repeating-radial-gradient(
+      ellipse at 50% 80%,
+      transparent,
+      transparent 100px,
+      #143a1a 101px,
+      transparent 102px
+    );
+}
+
+/* Subtle grain texture overlay */
+.ftf-grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.012;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(20, 58, 26, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 58, 26, 0.25);
+}
+
+/* Fade-in animation for page content */
+@keyframes ftf-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ftf-animate-in {
+  animation: ftf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.ftf-animate-in-delay-1 {
+  animation: ftf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.08s forwards;
+  opacity: 0;
+}
+
+.ftf-animate-in-delay-2 {
+  animation: ftf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.16s forwards;
+  opacity: 0;
+}
+
+.ftf-animate-in-delay-3 {
+  animation: ftf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards;
+  opacity: 0;
+}
+
+.ftf-animate-in-delay-4 {
+  animation: ftf-fade-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.32s forwards;
+  opacity: 0;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(20, 58, 26, 0.15);
+  color: #0a1f0a;
 }

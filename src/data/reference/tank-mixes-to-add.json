@@ -1,0 +1,236 @@
+[
+  {
+    "_status": "READY",
+    "weed": "Parthenium weed",
+    "recipes": [
+      {
+        "name": "2,4-D Amine Standard",
+        "chemicals": [{"product": "2,4-D Amine 625", "rate": "2–3 L/ha"}],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Self-surfactant amine",
+        "notes": "Apply at rosette stage. Cheap and effective for broad-acre."
+      },
+      {
+        "name": "Metsulfuron + 2,4-D Combo",
+        "chemicals": [
+          {"product": "Metsulfuron 600 WG", "rate": "5 g/ha"},
+          {"product": "2,4-D Amine 625", "rate": "1.5 L/ha"}
+        ],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "BS1000 at label rate",
+        "notes": "Dual action — 2,4-D for knockdown, metsulfuron for residual seedling suppression."
+      },
+      {
+        "name": "Metsulfuron Solo (Residual)",
+        "chemicals": [{"product": "Metsulfuron 600 WG", "rate": "5–7 g/ha"}],
+        "water": "≥50 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "BS1000 at label rate",
+        "notes": "Good residual control. Slower acting but suppresses seedling germination for months."
+      }
+    ]
+  },
+  {
+    "_status": "READY",
+    "weed": "Rubber vine",
+    "recipes": [
+      {
+        "name": "Garlon 600 Aerial Foliar",
+        "chemicals": [{"product": "Garlon 600", "rate": "Per aerial label rate"}],
+        "water": "≥100 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Pulse Penetrant at 200 mL/100 L",
+        "notes": "Standard foliar for rubber vine. Full leaf coverage critical."
+      },
+      {
+        "name": "Imazapyr + Triclopyr Combo",
+        "chemicals": [
+          {"product": "Imazapyr 250", "rate": "2 L/ha"},
+          {"product": "Garlon 600", "rate": "Per label rate"}
+        ],
+        "water": "≥100 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Pulse Penetrant at 200 mL/100 L",
+        "notes": "Dual action — triclopyr for foliar knockdown, imazapyr for soil residual preventing regrowth."
+      },
+      {
+        "name": "Graslan Pellets (Granular)",
+        "chemicals": [{"product": "Graslan Aerial", "rate": "kg/ha per label"}],
+        "water": "N/A — dry granular",
+        "droplet": "N/A — pellet spread",
+        "adjuvant": "None",
+        "notes": "Soil-active tebuthiuron. Apply before wet season. Broad-spectrum — affects all woody species."
+      }
+    ]
+  },
+  {
+    "_status": "READY",
+    "weed": "Paterson's curse",
+    "recipes": [
+      {
+        "name": "2,4-D Amine Standard",
+        "chemicals": [{"product": "2,4-D Amine 625", "rate": "2–3 L/ha"}],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Self-surfactant amine",
+        "notes": "Apply at rosette stage in autumn-winter. Cheap and effective for large areas."
+      },
+      {
+        "name": "MCPA + Metsulfuron Combo",
+        "chemicals": [
+          {"product": "MCPA 750", "rate": "1.5 L/ha"},
+          {"product": "Metsulfuron 600 WG", "rate": "5 g/ha"}
+        ],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "BS1000 at label rate",
+        "notes": "MCPA for knockdown, metsulfuron for residual. Good for paddocks with mixed broadleaf weeds."
+      },
+      {
+        "name": "Metsulfuron Solo (Residual)",
+        "chemicals": [{"product": "Metsulfuron 600 WG", "rate": "5–7 g/ha"}],
+        "water": "≥50 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "BS1000 at label rate",
+        "notes": "Good residual but slower. Suppresses seedling germination. Best where ongoing management needed."
+      }
+    ]
+  },
+  {
+    "_status": "READY",
+    "weed": "Scotch thistle / spear thistle / variegated thistle",
+    "recipes": [
+      {
+        "name": "2,4-D Amine Standard",
+        "chemicals": [{"product": "2,4-D Amine 625", "rate": "2–3 L/ha"}],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Self-surfactant amine",
+        "notes": "Rosette stage ONLY. Once thistles bolt, 2,4-D is largely ineffective."
+      },
+      {
+        "name": "Clopyralid (Lontrel) — Premium Option",
+        "chemicals": [{"product": "Lontrel 300", "rate": "0.3–0.5 L/ha"}],
+        "water": "≥50 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "Wetting agent at label rate",
+        "notes": "Highly selective Asteraceae killer. Excellent residual. Safe in grass. Higher cost but best efficacy."
+      },
+      {
+        "name": "MCPA + Clopyralid Combo",
+        "chemicals": [
+          {"product": "MCPA 750", "rate": "1 L/ha"},
+          {"product": "Lontrel 300", "rate": "0.25 L/ha"}
+        ],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Per label",
+        "notes": "Broadens the broadleaf spectrum while maintaining clopyralid residual on thistles."
+      }
+    ]
+  },
+  {
+    "_status": "READY",
+    "weed": "Fallow weeds (general)",
+    "recipes": [
+      {
+        "name": "Glyphosate Standard Knockdown",
+        "chemicals": [{"product": "Glyphosate 450", "rate": "2–4 L/ha"}],
+        "water": "≥30 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "Most formulations self-surfactant",
+        "notes": "Standard pre-plant fallow knockdown. Non-selective, no residual. Cheapest option."
+      },
+      {
+        "name": "Glyphosate + 2,4-D Double Knock",
+        "chemicals": [
+          {"product": "Glyphosate 450", "rate": "2–3 L/ha"},
+          {"product": "2,4-D Amine 625", "rate": "1.5 L/ha"}
+        ],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse",
+        "adjuvant": "Per glyphosate label",
+        "notes": "Industry standard double-knock for resistant weed management. 2,4-D adds broadleaf residual. Check plant-back periods."
+      },
+      {
+        "name": "Glyphosate + Dicamba (Tough Broadleaf)",
+        "chemicals": [
+          {"product": "Glyphosate 450", "rate": "2–3 L/ha"},
+          {"product": "Kamba 750", "rate": "0.3–0.5 L/ha"}
+        ],
+        "water": "≥50 L/ha",
+        "droplet": "Coarse–Very Coarse — DRIFT CRITICAL",
+        "adjuvant": "Per label only — NO extra oils",
+        "notes": "For fallow with tough broadleaf weeds (marshmallow, fleabane). EXTREME drift caution with dicamba — temp and wind restrictions."
+      }
+    ]
+  },
+  {
+    "_status": "READY",
+    "weed": "Giant Parramatta grass",
+    "recipes": [
+      {
+        "name": "Taskforce 745 Standard",
+        "chemicals": [{"product": "Taskforce 745", "rate": "2–3 L/ha"}],
+        "water": "40–80 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "NO surfactant",
+        "notes": "Same approach as GRT grass. Flupropanate is the primary tool."
+      },
+      {
+        "name": "Taskforce + Glyphosate Knockdown",
+        "chemicals": [
+          {"product": "Taskforce 745", "rate": "2 L/ha"},
+          {"product": "Glyphosate 450", "rate": "2–3 L/ha"}
+        ],
+        "water": "50–80 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "NO surfactant with Taskforce — self-surfactant glyphosate only",
+        "notes": "Glyphosate for immediate visual knockdown, Taskforce for long-term residual."
+      },
+      {
+        "name": "Taskforce High Rate",
+        "chemicals": [{"product": "Taskforce 745", "rate": "3 L/ha"}],
+        "water": "60–80 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "NO surfactant",
+        "notes": "For heavy infestations. Extended withholding at higher rates."
+      }
+    ]
+  },
+  {
+    "_status": "READY",
+    "weed": "Coolatai grass",
+    "recipes": [
+      {
+        "name": "Taskforce 745 Standard",
+        "chemicals": [{"product": "Taskforce 745", "rate": "2 L/ha"}],
+        "water": "40–80 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "NO surfactant",
+        "notes": "Flupropanate is the only effective chemical for Coolatai grass."
+      },
+      {
+        "name": "Taskforce + Glyphosate",
+        "chemicals": [
+          {"product": "Taskforce 745", "rate": "2 L/ha"},
+          {"product": "Glyphosate 450", "rate": "2–3 L/ha"}
+        ],
+        "water": "50–80 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "NO surfactant with Taskforce",
+        "notes": "Glyphosate knockdown + flupropanate residual. Plan pasture re-seeding."
+      },
+      {
+        "name": "Taskforce High Rate (Dense)",
+        "chemicals": [{"product": "Taskforce 745", "rate": "3 L/ha"}],
+        "water": "60–80 L/ha",
+        "droplet": "Medium–Coarse",
+        "adjuvant": "NO surfactant",
+        "notes": "For dense Coolatai infestations. Monitor and re-treat as needed."
+      }
+    ]
+  }
+]

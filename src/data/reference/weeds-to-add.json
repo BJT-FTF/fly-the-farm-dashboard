@@ -1,0 +1,146 @@
+[
+  {
+    "weed": "Parthenium weed",
+    "region": "QLD (central/north)",
+    "wons": true,
+    "primaryChemicals": ["2,4-D Amine", "Metsulfuron 600 WG", "Atrazine"],
+    "droneViable": true,
+    "notes": "Major WoNS in QLD. Causes allergic reactions in humans/livestock. Rosette stage treatment critical."
+  },
+  {
+    "weed": "Rubber vine",
+    "region": "QLD (tropical/subtropical)",
+    "wons": true,
+    "primaryChemicals": ["Garlon 600", "Grazon Extra", "Imazapyr 250", "Tebuthiuron"],
+    "droneViable": true,
+    "notes": "Aggressive woody vine smothering native riparian vegetation. Multiple chemical approaches."
+  },
+  {
+    "weed": "Bellyache bush",
+    "region": "QLD (tropical)",
+    "wons": true,
+    "primaryChemicals": ["Garlon 600", "Grazon Extra", "Fluroxypyr"],
+    "droneViable": true,
+    "notes": "Toxic to livestock. Seed bank persistent — long-term follow-up needed."
+  },
+  {
+    "weed": "Paterson's curse",
+    "region": "NSW, VIC, SA, WA",
+    "wons": true,
+    "primaryChemicals": ["2,4-D Amine", "MCPA", "Metsulfuron 600 WG"],
+    "droneViable": true,
+    "notes": "Purple flowering broadleaf. Toxic to horses. Massive areas — ideal drone target."
+  },
+  {
+    "weed": "Scotch thistle",
+    "region": "NSW, VIC, SA, TAS",
+    "wons": false,
+    "primaryChemicals": ["2,4-D Amine", "MCPA", "Clopyralid", "Metsulfuron"],
+    "droneViable": true,
+    "notes": "Large biennial thistle. Must treat at rosette stage before bolting."
+  },
+  {
+    "weed": "Spear thistle",
+    "region": "All states",
+    "wons": false,
+    "primaryChemicals": ["2,4-D Amine", "MCPA", "Clopyralid"],
+    "droneViable": true,
+    "notes": "Most common thistle across AU. Rosette-stage treatment."
+  },
+  {
+    "weed": "Variegated thistle",
+    "region": "NSW, VIC, SA",
+    "wons": false,
+    "primaryChemicals": ["2,4-D Amine", "MCPA", "Clopyralid"],
+    "droneViable": true,
+    "notes": "Winter-growing thistle. Toxic to livestock (nitrate poisoning)."
+  },
+  {
+    "weed": "Cat's claw creeper",
+    "region": "SE QLD, northern NSW",
+    "wons": true,
+    "primaryChemicals": ["Garlon 600", "Metsulfuron", "Triclopyr"],
+    "droneViable": true,
+    "notes": "Underground tuber system makes eradication very difficult. Repeat treatments essential."
+  },
+  {
+    "weed": "Giant Parramatta grass",
+    "region": "NSW (north coast/tablelands)",
+    "wons": false,
+    "primaryChemicals": ["Taskforce 745", "Glyphosate"],
+    "droneViable": true,
+    "notes": "Same chemistry as GRT grass. Flupropanate is primary tool."
+  },
+  {
+    "weed": "Coolatai grass",
+    "region": "NSW (northern tablelands)",
+    "wons": false,
+    "primaryChemicals": ["Taskforce 745"],
+    "droneViable": true,
+    "notes": "Spreading invasive perennial grass. Flupropanate only chemical option."
+  },
+  {
+    "weed": "Groundsel bush",
+    "region": "NSW (coast/hinterland)",
+    "wons": false,
+    "primaryChemicals": ["Metsulfuron", "Fluroxypyr", "Glyphosate"],
+    "droneViable": true,
+    "notes": "Dense shrub invading cleared land and riparian zones."
+  },
+  {
+    "weed": "Bitou bush",
+    "region": "NSW (coast)",
+    "wons": true,
+    "primaryChemicals": ["Metsulfuron", "Glyphosate"],
+    "droneViable": true,
+    "notes": "Coastal dune/headland invader. WoNS. Large-area aerial programs in NSW."
+  },
+  {
+    "weed": "Privet (broad-leaf / small-leaf)",
+    "region": "NSW, QLD (eastern)",
+    "wons": false,
+    "primaryChemicals": ["Garlon 600", "Metsulfuron", "Glyphosate"],
+    "droneViable": true,
+    "notes": "Common garden escape invading bushland. Both species aggressive."
+  },
+  {
+    "weed": "Mother of millions",
+    "region": "QLD, NSW",
+    "wons": false,
+    "primaryChemicals": ["Fluroxypyr", "2,4-D"],
+    "droneViable": true,
+    "notes": "Succulent — toxic to cattle. Limited chemical options. Aerial for broad-acre paddock infestations."
+  },
+  {
+    "weed": "Lippia",
+    "region": "QLD, NSW (floodplains)",
+    "wons": false,
+    "primaryChemicals": ["2,4-D", "Metsulfuron", "Fluroxypyr"],
+    "droneViable": true,
+    "notes": "Creeping perennial on floodplains. Difficult to control. Repeat treatments."
+  },
+  {
+    "weed": "Dock (curled / broadleaf)",
+    "region": "All states",
+    "wons": false,
+    "primaryChemicals": ["2,4-D", "MCPA", "Dicamba", "Thifensulfuron"],
+    "droneViable": true,
+    "notes": "Common pasture weed across southern AU. Deep taproot makes it persistent."
+  },
+  {
+    "weed": "Capeweed",
+    "region": "NSW, VIC, SA, WA, TAS",
+    "wons": false,
+    "primaryChemicals": ["2,4-D", "MCPA", "Metsulfuron"],
+    "droneViable": true,
+    "notes": "Winter annual. Very common in pastures. MCPA/2,4-D at rosette stage."
+  },
+  {
+    "weed": "Fallow weeds (general broadleaf + grass)",
+    "region": "All cropping regions",
+    "wons": false,
+    "primaryChemicals": ["Glyphosate 450", "2,4-D", "Dicamba"],
+    "droneViable": true,
+    "notes": "Pre-plant fallow knockdown is a high-demand drone application. Glyphosate + 2,4-D double-knock common."
+  }
+]

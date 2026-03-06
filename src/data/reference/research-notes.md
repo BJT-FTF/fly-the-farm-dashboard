@@ -79,6 +79,31 @@ ambiguity). Products with NO aerial directions = not-permitted.
 - Key uses: woody weeds, lantana, blackberry
 - STATUS: READY TO ADD
 
+### Hatchet (Conquest) — APVMA 61863
+- Active: Triclopyr 300g/L + Picloram 100g/L
+- Registrant: Conquest Crop Protection
+- Aerial Application (Table B, page 7 of label):
+  - Blackberry: 10 L/ha, summer–autumn, NSW/QLD/SA/VIC/WA
+  - Lantana: 10 L/ha helicopter, or 1.5 L Hatchet + 6 L 2,4-D Amine 625/ha (helicopter only, late autumn, NSW/ACT/NT/QLD)
+  - Gorse: helicopter only, TAS
+  - Rubber vine: Per Table B
+  - St John's wort: Per Table B
+  - Crofton weed / Mistflower / Cockspur thorn: 1.5 L + 6 L 2,4-D Amine/ha (helicopter, late autumn)
+- General aerial params:
+  - Water: 200 L/ha (100 L per pass, double overlap)
+  - Minimum spray volume: 70 L/ha (some weeds 150 L/ha)
+  - Droplet: Coarse–Very Coarse (VMD 250–350 µm)
+  - Wind: <15 km/hr
+  - Temperature: <35°C
+- STATUS: ADDED TO DB
+
+### Hatchet Extra (Conquest) — APVMA 94072
+- Active: Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L
+- Same aerial parameters as Hatchet
+- Aminopyralid adds residual broadleaf suppression and wider spectrum
+- Three-way synergy for resistant woody weeds
+- STATUS: ADDED TO DB
+
 ### Hexazinone (Velpar L, Velmac G)
 - Soil-active woody weed control
 - Aerial (granular) for some formulations

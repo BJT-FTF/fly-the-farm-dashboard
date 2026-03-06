@@ -1,6 +1,6 @@
 [
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Most widely used herbicide in AU. Dozens of brands with aerial labels.",
     "id": "fallow-glyphosate-450",
     "weed": "Fallow / general knockdown",
@@ -17,7 +17,7 @@
     "adjuvantNotes": "Most formulations self-surfactant. Do NOT add extra surfactant unless label directs."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Pasture broadleaf — thistles, dock, capeweed, fireweed, Paterson's curse",
     "id": "pasture-broadleaf-2-4-d",
     "weed": "Thistles / Paterson's curse / capeweed",
@@ -34,7 +34,7 @@
     "adjuvantNotes": "Most amine formulations self-surfactant. Do not add oil-based adjuvants — increases drift."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Phenoxy broadleaf for pasture. Complementary to 2,4-D.",
     "id": "pasture-broadleaf-mcpa",
     "weed": "Thistles / capeweed / dock / sorrel",
@@ -51,7 +51,7 @@
     "adjuvantNotes": "Most formulations self-surfactant. Do not add oil-based adjuvants."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Broadleaf selective in grass. Good on woody seedlings and hard-to-kill broadleafs.",
     "id": "pasture-broadleaf-fluroxypyr",
     "weed": "Thistles / bindweed / woody seedlings",
@@ -68,7 +68,7 @@
     "adjuvantNotes": "Wetting agent at label rate (e.g. BS1000). Oil-based adjuvants may improve uptake on waxy leaves."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Broadleaf selective in pasture. Extreme drift/volatility risk — strong warnings needed.",
     "id": "pasture-broadleaf-dicamba",
     "weed": "Thistles / dock / hardheads / bindweed",
@@ -85,7 +85,7 @@
     "adjuvantNotes": "Per label only. Do NOT add extra surfactants or oil — increases volatility and drift."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Non-selective residual. Total vegetation control for rights-of-way, woody weeds.",
     "id": "woody-imazapyr",
     "weed": "Rubber vine / woody weeds / total vegetation",
@@ -102,7 +102,7 @@
     "adjuvantNotes": "Wetting agent at label rate. Surfactant improves foliar uptake on woody species."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Parthenium is a WoNS in QLD — common drone target.",
     "id": "parthenium-2-4-d",
     "weed": "Parthenium weed",
@@ -119,7 +119,7 @@
     "adjuvantNotes": "Self-surfactant amine formulations. Do not add oils."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Parthenium alternative — metsulfuron provides longer residual.",
     "id": "parthenium-metsulfuron",
     "weed": "Parthenium weed",
@@ -136,7 +136,7 @@
     "adjuvantNotes": "BS1000 wetting agent at label rate."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "QLD WoNS. Aggressive woody vine — major threat in tropical/sub-tropical.",
     "id": "rubber-vine-triclopyr",
     "weed": "Rubber vine",
@@ -153,7 +153,7 @@
     "adjuvantNotes": "Pulse Penetrant at 200 mL/100 L — essential for waxy vine leaves."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Rubber vine with imazapyr for long residual.",
     "id": "rubber-vine-imazapyr",
     "weed": "Rubber vine",
@@ -170,7 +170,7 @@
     "adjuvantNotes": "Wetting agent at label rate."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "QLD WoNS — tropical woody shrub.",
     "id": "bellyache-bush-triclopyr",
     "weed": "Bellyache bush",
@@ -187,7 +187,7 @@
     "adjuvantNotes": "Pulse Penetrant at 200 mL/100 L."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Common pasture weed — NSW/VIC/SA. Purple bugloss.",
     "id": "patersons-curse-2-4-d",
     "weed": "Paterson's curse",
@@ -204,7 +204,7 @@
     "adjuvantNotes": "Self-surfactant amine. Do not add oils."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Paterson's curse alternative with residual.",
     "id": "patersons-curse-metsulfuron",
     "weed": "Paterson's curse",
@@ -221,7 +221,7 @@
     "adjuvantNotes": "BS1000 wetting agent at label rate."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Giant Parramatta grass — NSW invasive grass. Same chemical as GRT.",
     "id": "giant-parramatta-grass-taskforce",
     "weed": "Giant Parramatta grass",
@@ -238,7 +238,7 @@
     "adjuvantNotes": "NO surfactant — label prohibits. Do not tank mix with surfactants."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Coolatai grass — NSW invasive. Flupropanate is primary chemical option.",
     "id": "coolatai-grass-taskforce",
     "weed": "Coolatai grass",
@@ -255,7 +255,7 @@
     "adjuvantNotes": "NO surfactant — label prohibits."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Scotch/Spear/Variegated thistle — extremely common across SE Aus.",
     "id": "thistles-2-4-d",
     "weed": "Scotch thistle / spear thistle / variegated thistle",
@@ -272,7 +272,7 @@
     "adjuvantNotes": "Self-surfactant amine. Do not add oils or penetrants."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Thistles alternative — clopyralid is highly effective on Asteraceae.",
     "id": "thistles-clopyralid",
     "weed": "Scotch thistle / spear thistle / variegated thistle",
@@ -289,7 +289,7 @@
     "adjuvantNotes": "Wetting agent at label rate."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Cat's claw creeper — SE QLD/northern NSW. Environmental weed.",
     "id": "cats-claw-creeper-triclopyr",
     "weed": "Cat's claw creeper",
@@ -306,7 +306,7 @@
     "adjuvantNotes": "Pulse Penetrant at 200 mL/100 L — essential for vine leaf penetration."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Groundsel bush — NSW coast. Bitou bush relative.",
     "id": "groundsel-bush-metsulfuron",
     "weed": "Groundsel bush",
@@ -323,7 +323,7 @@
     "adjuvantNotes": "BS1000 wetting agent at label rate."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Bitou bush — NSW coastal environmental weed.",
     "id": "bitou-bush-metsulfuron",
     "weed": "Bitou bush",
@@ -340,7 +340,7 @@
     "adjuvantNotes": "BS1000 wetting agent at label rate."
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "_notes": "Privet — common environmental weed across eastern AU.",
     "id": "privet-triclopyr-metsulfuron",
     "weed": "Privet (broad-leaf / small-leaf)",

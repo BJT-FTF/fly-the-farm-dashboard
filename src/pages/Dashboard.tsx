@@ -22,6 +22,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import BlockIcon from '@mui/icons-material/Block';
 import PublicIcon from '@mui/icons-material/Public';
 import SearchBar from '../components/SearchBar';
+import WeedIdentifier from '../components/WeedIdentifier';
 import { treatments, getAllWeeds, getSavedAPVMACount } from '../data/chemicals';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -91,8 +92,13 @@ export default function Dashboard() {
         </Box>
       </Box>
 
+      {/* Weed Identifier */}
+      <Box className="ftf-animate-in-delay-1" sx={{ maxWidth: 480, mx: 'auto', mb: 4 }}>
+        <WeedIdentifier />
+      </Box>
+
       {/* Stats row */}
-      <Box className="ftf-animate-in-delay-1">
+      <Box className="ftf-animate-in-delay-2">
         <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 1.5 }}>
           Database Overview
         </Typography>
@@ -132,7 +138,7 @@ export default function Dashboard() {
       </Box>
 
       {/* Status category cards */}
-      <Box className="ftf-animate-in-delay-2">
+      <Box className="ftf-animate-in-delay-3">
         <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 1.5 }}>
           Browse by Drone Status
         </Typography>
@@ -200,7 +206,7 @@ export default function Dashboard() {
       </Box>
 
       {/* Weed tags */}
-      <Box className="ftf-animate-in-delay-3">
+      <Box className="ftf-animate-in-delay-4">
         <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 1.5 }}>
           Browse by Weed
         </Typography>

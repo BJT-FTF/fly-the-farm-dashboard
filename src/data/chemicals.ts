@@ -1,5 +1,36 @@
-import { WeedTreatment } from '../types/chemical';
+import { WeedTreatment, AustralianState, Season, ALL_STATES, ALL_SEASONS } from '../types/chemical';
 import { getSavedChemicals } from '../services/savedChemicals';
+
+/**
+ * Derive applicable seasons from bestTiming text.
+ * Returns the explicit `season` field if set, otherwise parses from bestTiming.
+ */
+export function getSeasonsForTreatment(t: WeedTreatment): Season[] {
+  if (t.season) return t.season;
+
+  const bt = t.bestTiming.toLowerCase();
+
+  // Check for explicit season keywords
+  const seasons: Season[] = [];
+  if (/spring/.test(bt)) seasons.push('Spring');
+  if (/summer|wet season/.test(bt)) seasons.push('Summer');
+  if (/autumn|fall/.test(bt)) seasons.push('Autumn');
+  if (/winter/.test(bt)) seasons.push('Winter');
+
+  // If we found explicit seasons, return them
+  if (seasons.length > 0) return seasons;
+
+  // "Active growth" / "per label" / generic = year-round
+  return [...ALL_SEASONS];
+}
+
+/**
+ * Get applicable states for a treatment.
+ * Returns explicit `states` field if set, otherwise all states (nationally registered).
+ */
+export function getStatesForTreatment(t: WeedTreatment): AustralianState[] {
+  return t.states || [...ALL_STATES];
+}
 
 function getAllTreatments(): WeedTreatment[] {
   return [...treatments, ...getSavedChemicals()];
@@ -11,9 +42,10 @@ const defaultDroneParams = {
   speedMs: '4–6 m/s',
 };
 
-// APVMA PubCRIS label search helper
+// APVMA label search — Google search pre-populated with product name
+// (APVMA PubCRIS portal doesn't support direct URL search)
 const apvmaLabel = (product: string) =>
-  `https://portal.apvma.gov.au/pubcris?p=search&type=all&q=${encodeURIComponent(product)}`;
+  `https://www.google.com/search?q=${encodeURIComponent(`APVMA label "${product}" Australia`)}`;
 
 // Well-known label URLs — manufacturer product pages
 const LABEL_URLS: Record<string, string> = {
@@ -25,6 +57,8 @@ const LABEL_URLS: Record<string, string> = {
   'roundup-biactive': apvmaLabel('Roundup Biactive'),
   'weedmaster-duo': apvmaLabel('Weedmaster Duo'),
   'hotshot': apvmaLabel('Hotshot'),
+  'hatchet': apvmaLabel('Hatchet'),
+  'hatchet-extra': apvmaLabel('Hatchet Extra'),
 };
 
 export const treatments: WeedTreatment[] = [
@@ -68,6 +102,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Late spring–early summer, full leaf',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['grazon-extra'],
   },
   {
@@ -96,6 +132,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['NSW', 'QLD'],
+    season: ['Winter', 'Spring'],
     labelUrl: LABEL_URLS['grazon-extra'],
   },
   {
@@ -124,6 +162,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth phase, moist soil',
     adjuvantNotes: 'No surfactant (label); avoid tank mix with surfactants',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['taskforce-745'],
   },
   {
@@ -138,6 +178,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'No surfactant (label); avoid tank mix with surfactants',
+    states: ['NSW', 'VIC', 'ACT', 'TAS'],
+    season: ['Spring', 'Summer', 'Autumn'],
     labelUrl: LABEL_URLS['taskforce-745'],
   },
   {
@@ -152,6 +194,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth phase, moist soil',
     adjuvantNotes: 'No surfactant (label); avoid tank mix with surfactants',
+    states: ['NSW', 'VIC', 'QLD', 'ACT'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['taskforce-745'],
   },
   {
@@ -166,6 +210,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth phase, moist soil',
     adjuvantNotes: 'No surfactant (label); avoid tank mix with surfactants',
+    states: ['NSW', 'VIC', 'SA', 'ACT'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['taskforce-745'],
   },
   {
@@ -180,6 +226,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'BS1000 at label rate',
+    states: ['NT', 'QLD', 'WA'],
+    season: ['Summer', 'Autumn'],
     labelUrl: LABEL_URLS['metsulfuron-600'],
   },
   {
@@ -208,6 +256,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['QLD', 'NT', 'WA'],
     labelUrl: LABEL_URLS['graslan-aerial'],
   },
   {
@@ -222,6 +271,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['QLD', 'NT', 'WA'],
     labelUrl: LABEL_URLS['graslan-aerial'],
   },
   {
@@ -236,6 +286,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['QLD', 'NT', 'WA'],
     labelUrl: LABEL_URLS['graslan-aerial'],
   },
   {
@@ -250,6 +301,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['NSW', 'SA', 'VIC', 'QLD'],
     labelUrl: LABEL_URLS['graslan-aerial'],
   },
   {
@@ -264,6 +316,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['QLD', 'NT'],
     labelUrl: LABEL_URLS['graslan-aerial'],
   },
   {
@@ -278,6 +331,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['NSW', 'QLD', 'NT'],
+    season: ['Summer', 'Autumn'],
     labelUrl: LABEL_URLS['roundup-biactive'],
   },
   {
@@ -292,6 +347,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['QLD', 'NSW', 'NT'],
+    season: ['Summer', 'Autumn'],
     labelUrl: LABEL_URLS['roundup-biactive'],
   },
   {
@@ -306,6 +363,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['QLD', 'NSW', 'NT'],
+    season: ['Summer'],
     labelUrl: LABEL_URLS['roundup-biactive'],
   },
   {
@@ -320,6 +379,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Per label',
+    states: ['NSW', 'QLD'],
+    season: ['Summer', 'Autumn'],
     labelUrl: LABEL_URLS['roundup-biactive'],
   },
   {
@@ -348,6 +409,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['QLD', 'NSW', 'NT'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['grazon-extra'],
   },
   {
@@ -362,6 +425,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['QLD', 'NT', 'WA'],
     labelUrl: LABEL_URLS['graslan-aerial'],
   },
   {
@@ -390,6 +454,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Late spring–early summer, full leaf',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['grazon-extra'],
   },
   {
@@ -404,6 +470,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['TAS'],
     labelUrl: LABEL_URLS['grazon-extra'],
   },
   {
@@ -418,6 +485,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: null,
     bestTiming: 'Best seasonal window per label',
     adjuvantNotes: 'Penetrant (e.g. Pulse) at label rate',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['grazon-extra'],
   },
 
@@ -532,6 +601,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Rosette to early bolt stage. Excellent residual on Asteraceae family weeds.',
     adjuvantNotes: 'Wetting agent at label rate.',
+    season: ['Winter', 'Spring'],
     labelUrl: apvmaLabel('Clopyralid'),
   },
 
@@ -548,6 +618,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm)', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
     bestTiming: 'Apply at rosette stage before bolting. Once flowering, efficacy drops significantly.',
     adjuvantNotes: 'Self-surfactant amine formulations. Do not add oils.',
+    states: ['QLD', 'NSW'],
+    season: ['Summer', 'Autumn'],
     labelUrl: apvmaLabel('2,4-D Amine'),
   },
 
@@ -564,6 +636,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Rosette to early bolt. Residual suppresses germinating seedlings 3–6 months.',
     adjuvantNotes: 'BS1000 wetting agent at label rate.',
+    states: ['QLD', 'NSW'],
+    season: ['Summer', 'Autumn'],
     labelUrl: LABEL_URLS['metsulfuron-600'],
   },
 
@@ -580,6 +654,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth (wet season). Full leaf coverage critical for systemic uptake.',
     adjuvantNotes: 'Pulse Penetrant at 200 mL/100 L — essential for waxy vine leaves.',
+    states: ['QLD', 'NT'],
+    season: ['Summer'],
     labelUrl: LABEL_URLS['garlon-600'],
   },
 
@@ -596,6 +672,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Wet season active growth. Soil residual prevents regrowth 12+ months.',
     adjuvantNotes: 'Wetting agent at label rate.',
+    states: ['QLD', 'NT'],
+    season: ['Summer'],
     labelUrl: apvmaLabel('Imazapyr'),
   },
 
@@ -612,6 +690,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Wet season active growth before seed set.',
     adjuvantNotes: 'Pulse Penetrant at 200 mL/100 L.',
+    states: ['QLD', 'NT'],
+    season: ['Summer'],
     labelUrl: LABEL_URLS['garlon-600'],
   },
 
@@ -628,6 +708,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm)', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
     bestTiming: 'Rosette stage before bolting (late autumn–winter). Once flowering, efficacy drops.',
     adjuvantNotes: 'Self-surfactant amine. Do not add oils.',
+    season: ['Autumn', 'Winter'],
     labelUrl: apvmaLabel('2,4-D Amine'),
   },
 
@@ -644,6 +725,7 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Rosette to early bolt. Residual suppresses germinating seedlings.',
     adjuvantNotes: 'BS1000 wetting agent at label rate.',
+    season: ['Autumn', 'Winter'],
     labelUrl: LABEL_URLS['metsulfuron-600'],
   },
 
@@ -660,6 +742,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth phase with adequate soil moisture.',
     adjuvantNotes: 'NO surfactant — label prohibits. Do not tank mix with surfactants.',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['taskforce-745'],
   },
 
@@ -676,6 +760,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth with good soil moisture. Spring–summer.',
     adjuvantNotes: 'NO surfactant — label prohibits.',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['taskforce-745'],
   },
 
@@ -692,6 +778,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth when vine canopy visible. Repeat treatments needed for underground tubers.',
     adjuvantNotes: 'Pulse Penetrant at 200 mL/100 L — essential for vine leaf penetration.',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['garlon-600'],
   },
 
@@ -708,6 +796,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth before flowering. Spring–early summer.',
     adjuvantNotes: 'BS1000 wetting agent at label rate.',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['metsulfuron-600'],
   },
 
@@ -724,6 +814,8 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth. Late spring–summer. Follow-up for seedlings from soil bank.',
     adjuvantNotes: 'BS1000 wetting agent at label rate.',
+    states: ['NSW'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['metsulfuron-600'],
   },
 
@@ -740,7 +832,383 @@ export const treatments: WeedTreatment[] = [
     droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
     bestTiming: 'Active growth with full leaf cover. Spring–summer.',
     adjuvantNotes: 'Pulse Penetrant at 200 mL/100 L.',
+    states: ['NSW', 'QLD'],
+    season: ['Spring', 'Summer'],
     labelUrl: LABEL_URLS['garlon-600'],
+  },
+
+  // ── Hatchet (Conquest) — Triclopyr 300 + Picloram 100 ──
+
+  // Hatchet — Blackberry (aerial)
+  {
+    id: 'blackberry-hatchet',
+    weed: 'Blackberry',
+    brands: 'Hatchet (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Table B aerial rates apply.',
+    aerialRate: '10 L/ha',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Summer–autumn, full leaf. Apply 200 L/ha water (100 L per pass, double overlap).',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    labelUrl: LABEL_URLS['hatchet'],
+  },
+
+  // Hatchet — Lantana (aerial — helicopter/drone)
+  {
+    id: 'lantana-hatchet',
+    weed: 'Lantana',
+    brands: 'Hatchet (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
+    droneStatus: 'permitted-helicopter-caution',
+    droneStatusNote: 'Label specifies helicopter — drones included under APVMA aerial definition; use caution.',
+    aerialRate: '10 L/ha (helicopter), or 1.5 L + 6 L 2,4-D Amine 625/ha',
+    waterLHa: '≥150',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Late autumn. NSW, ACT, NT, QLD only.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    states: ['NSW', 'ACT', 'NT', 'QLD'],
+    season: ['Autumn'],
+    labelUrl: LABEL_URLS['hatchet'],
+  },
+
+  // Hatchet — Gorse (aerial — helicopter TAS)
+  {
+    id: 'gorse-hatchet',
+    weed: 'Gorse',
+    brands: 'Hatchet (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
+    droneStatus: 'permitted-helicopter-caution',
+    droneStatusNote: 'Label specifies helicopter only in TAS — drones included under APVMA aerial definition.',
+    aerialRate: 'Per Table B (helicopter TAS)',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth before seed set. Tasmania only.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    states: ['TAS'],
+    season: ['Spring', 'Summer'],
+    labelUrl: LABEL_URLS['hatchet'],
+  },
+
+  // Hatchet — Rubber vine (aerial)
+  {
+    id: 'rubber-vine-hatchet',
+    weed: 'Rubber vine',
+    brands: 'Hatchet (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Table B aerial rates apply.',
+    aerialRate: 'Per Table B aerial rate',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth (wet season). Full leaf coverage critical.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    states: ['QLD', 'NT'],
+    season: ['Summer'],
+    labelUrl: LABEL_URLS['hatchet'],
+  },
+
+  // Hatchet — St John's wort (aerial)
+  {
+    id: 'st-johns-wort-hatchet',
+    weed: "St John's wort",
+    brands: 'Hatchet (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Table B aerial rates apply.',
+    aerialRate: 'Per Table B aerial rate',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth, spring–early summer.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    labelUrl: LABEL_URLS['hatchet'],
+  },
+
+  // Hatchet — Crofton weed / Mistflower / Cockspur thorn (aerial)
+  {
+    id: 'crofton-weed-hatchet',
+    weed: 'Crofton weed / Mistflower / Cockspur thorn',
+    brands: 'Hatchet (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
+    droneStatus: 'permitted-helicopter-caution',
+    droneStatusNote: 'Label specifies helicopter — drones included under APVMA aerial definition.',
+    aerialRate: '1.5 L Hatchet + 6 L 2,4-D Amine 625/ha',
+    waterLHa: '≥150',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Late autumn. NSW, ACT, NT, QLD.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    states: ['NSW', 'ACT', 'NT', 'QLD'],
+    season: ['Autumn'],
+    labelUrl: LABEL_URLS['hatchet'],
+  },
+
+  // ── Hatchet Extra (Conquest) — Triclopyr 300 + Picloram 100 + Aminopyralid 8 ──
+
+  // Hatchet Extra — Blackberry (aerial)
+  {
+    id: 'blackberry-hatchet-extra',
+    weed: 'Blackberry',
+    brands: 'Hatchet Extra (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Three-way synergy — broader spectrum + residual vs Hatchet.',
+    aerialRate: '10 L/ha',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Summer–autumn, full leaf. Apply 200 L/ha water (100 L per pass, double overlap).',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    labelUrl: LABEL_URLS['hatchet-extra'],
+  },
+
+  // Hatchet Extra — Lantana (aerial)
+  {
+    id: 'lantana-hatchet-extra',
+    weed: 'Lantana',
+    brands: 'Hatchet Extra (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
+    droneStatus: 'permitted-helicopter-caution',
+    droneStatusNote: 'Label specifies helicopter — drones included under APVMA aerial definition. Aminopyralid adds residual vs standard Hatchet.',
+    aerialRate: '10 L/ha (helicopter), or 1.5 L + 6 L 2,4-D Amine 625/ha',
+    waterLHa: '≥150',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Late autumn. NSW, ACT, NT, QLD only.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    states: ['NSW', 'ACT', 'NT', 'QLD'],
+    season: ['Autumn'],
+    labelUrl: LABEL_URLS['hatchet-extra'],
+  },
+
+  // Hatchet Extra — Rubber vine (aerial)
+  {
+    id: 'rubber-vine-hatchet-extra',
+    weed: 'Rubber vine',
+    brands: 'Hatchet Extra (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Aminopyralid provides additional residual for regrowth suppression.',
+    aerialRate: 'Per Table B aerial rate',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth (wet season). Full leaf coverage critical.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    states: ['QLD', 'NT'],
+    season: ['Summer'],
+    labelUrl: LABEL_URLS['hatchet-extra'],
+  },
+
+  // Hatchet Extra — St John's wort (aerial)
+  {
+    id: 'st-johns-wort-hatchet-extra',
+    weed: "St John's wort",
+    brands: 'Hatchet Extra (Conquest)',
+    activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Table B aerial rates apply.',
+    aerialRate: 'Per Table B aerial rate',
+    waterLHa: '≥200',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth, spring–early summer.',
+    adjuvantNotes: 'Per label. Wind <15 km/hr, temp <35°C.',
+    labelUrl: LABEL_URLS['hatchet-extra'],
+  },
+
+  // ── Thistles — 2,4-D specific entry ──
+  {
+    id: 'thistles-2-4-d',
+    weed: 'Scotch thistle / spear thistle / variegated thistle',
+    brands: '2,4-D Amine 625 / Amicide Advance',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Use Coarse+ droplets — drift sensitive.',
+    aerialRate: '2–3 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Rosette stage — BEFORE bolting. Once stem elongation starts, efficacy drops drastically.',
+    adjuvantNotes: 'Self-surfactant amine. Do not add oils or penetrants.',
+    season: ['Winter', 'Spring'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+
+  // ── Mother of millions ──
+  {
+    id: 'mother-of-millions-fluroxypyr',
+    weed: 'Mother of millions',
+    brands: 'Starane Advanced / Comet 333 / Flagship 333',
+    activeIngredient: 'Fluroxypyr 333g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial where label includes aerial directions. Limited chemical options for this succulent weed.',
+    aerialRate: '0.5–1 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Apply when actively growing. Avoid drought-stressed plants — poor uptake on succulent leaves.',
+    adjuvantNotes: 'Wetting agent at label rate (e.g. BS1000). Oil-based adjuvant may improve penetration of waxy leaves.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Starane'),
+  },
+  {
+    id: 'mother-of-millions-2-4-d',
+    weed: 'Mother of millions',
+    brands: '2,4-D Amine 625 / Amicide Advance',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA). Less effective than fluroxypyr on this target.',
+    aerialRate: '2–3 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply to actively growing plants. Multiple applications typically needed.',
+    adjuvantNotes: 'Self-surfactant amine. Do not add oils.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+
+  // ── Lippia ──
+  {
+    id: 'lippia-2-4-d',
+    weed: 'Lippia',
+    brands: '2,4-D Amine 625 / Amicide Advance',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '2–3 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply during active growth. Repeat treatments essential — lippia regrows from stolons.',
+    adjuvantNotes: 'Self-surfactant amine. Do not add oils.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+  {
+    id: 'lippia-fluroxypyr',
+    weed: 'Lippia',
+    brands: 'Starane Advanced / Comet 333',
+    activeIngredient: 'Fluroxypyr 333g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial where label includes aerial directions.',
+    aerialRate: '0.5–1 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 300–450 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth on floodplains. Best in warmer months. Repeat annually.',
+    adjuvantNotes: 'Wetting agent at label rate.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Starane'),
+  },
+  {
+    id: 'lippia-metsulfuron',
+    weed: 'Lippia',
+    brands: 'Metsulfuron 600 WG / Associate / Brush-Off',
+    activeIngredient: 'Metsulfuron-methyl 600g/kg',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial.',
+    aerialRate: '5–7 g/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Active growth. Provides some residual suppression of re-establishing plants.',
+    adjuvantNotes: 'BS1000 wetting agent at label rate.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: LABEL_URLS['metsulfuron-600'],
+  },
+
+  // ── Dock (curled / broadleaf) ──
+  {
+    id: 'dock-2-4-d',
+    weed: 'Dock (curled / broadleaf)',
+    brands: '2,4-D Amine 625 / Amicide Advance',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '2–3 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Rosette stage before bolting. Deep taproot makes mature plants difficult.',
+    adjuvantNotes: 'Self-surfactant amine. Do not add oils.',
+    season: ['Autumn', 'Winter', 'Spring'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+  {
+    id: 'dock-mcpa',
+    weed: 'Dock (curled / broadleaf)',
+    brands: 'MCPA 750 / Agritone 750',
+    activeIngredient: 'MCPA 750g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.5–2 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Rosette stage in pasture. Apply during active growth.',
+    adjuvantNotes: 'Most formulations self-surfactant.',
+    season: ['Autumn', 'Winter', 'Spring'],
+    labelUrl: apvmaLabel('MCPA'),
+  },
+  {
+    id: 'dock-dicamba',
+    weed: 'Dock (curled / broadleaf)',
+    brands: 'Kamba 750 / Dicamba 700',
+    activeIngredient: 'Dicamba 700–750g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial. EXTREME CAUTION: Highly volatile — mandatory buffer zones.',
+    aerialRate: '0.3–0.7 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT CRITICAL', flightHeightM: '2–2.5 m AGL', speedMs: '3–4 m/s' },
+    bestTiming: 'Active growth. DO NOT apply when temp >28°C. Avoid inversions.',
+    adjuvantNotes: 'Per label only. Do NOT add extra surfactants or oil.',
+    season: ['Autumn', 'Winter', 'Spring'],
+    labelUrl: apvmaLabel('Dicamba'),
+  },
+
+  // ── Capeweed ──
+  {
+    id: 'capeweed-2-4-d',
+    weed: 'Capeweed',
+    brands: '2,4-D Amine 625 / Amicide Advance',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.5–2.5 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Winter rosette stage before flowering. Very common winter annual in southern pastures.',
+    adjuvantNotes: 'Self-surfactant amine. Do not add oils.',
+    season: ['Winter'],
+    states: ['NSW', 'VIC', 'SA', 'WA', 'TAS'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+  {
+    id: 'capeweed-mcpa',
+    weed: 'Capeweed',
+    brands: 'MCPA 750 / Agritone 750',
+    activeIngredient: 'MCPA 750g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1–1.5 L/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Coarse–Very Coarse (VMD 350–450 µm) — DRIFT SENSITIVE', flightHeightM: '2–2.5 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Rosette stage in winter. Apply when actively growing.',
+    adjuvantNotes: 'Most formulations self-surfactant.',
+    season: ['Winter'],
+    states: ['NSW', 'VIC', 'SA', 'WA', 'TAS'],
+    labelUrl: apvmaLabel('MCPA'),
+  },
+  {
+    id: 'capeweed-metsulfuron',
+    weed: 'Capeweed',
+    brands: 'Metsulfuron 600 WG / Associate / Brush-Off',
+    activeIngredient: 'Metsulfuron-methyl 600g/kg',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial.',
+    aerialRate: '5 g/ha',
+    waterLHa: '≥50',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–375 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Rosette to early flower. Provides residual suppression of late-germinating cohorts.',
+    adjuvantNotes: 'BS1000 wetting agent at label rate.',
+    season: ['Winter', 'Spring'],
+    states: ['NSW', 'VIC', 'SA', 'WA', 'TAS'],
+    labelUrl: LABEL_URLS['metsulfuron-600'],
   },
 ];
 

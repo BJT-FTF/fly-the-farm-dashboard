@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { formatSpeedWithKmh } from '../utils/speedConvert';
 import {
   Typography,
   Box,
@@ -26,7 +27,9 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import DescriptionIcon from '@mui/icons-material/Description';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import OpacityIcon from '@mui/icons-material/Opacity';
-import { getTreatmentById, getTreatmentsForWeed } from '../data/chemicals';
+import PlaceIcon from '@mui/icons-material/Place';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { getTreatmentById, getTreatmentsForWeed, getSeasonsForTreatment, getStatesForTreatment } from '../data/chemicals';
 import DroneStatusChip from '../components/DroneStatusChip';
 import ChemicalCard from '../components/ChemicalCard';
 
@@ -149,26 +152,47 @@ export default function TreatmentDetail() {
           </Typography>
         )}
         {treatment.labelUrl && (
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<DescriptionIcon />}
-            endIcon={<OpenInNewIcon sx={{ fontSize: '14px !important' }} />}
-            href={treatment.labelUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            sx={{
-              mt: 2,
-              fontWeight: 600,
-              borderColor: alpha(theme.palette.primary.main, 0.2),
-              '&:hover': {
-                borderColor: theme.palette.primary.main,
-                bgcolor: alpha(theme.palette.primary.main, 0.04),
-              },
-            }}
-          >
-            View Product Label (APVMA)
-          </Button>
+          <Box sx={{ display: 'flex', gap: 1.5, mt: 2, flexWrap: 'wrap' }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<DescriptionIcon />}
+              endIcon={<OpenInNewIcon sx={{ fontSize: '14px !important' }} />}
+              href={treatment.labelUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                fontWeight: 600,
+                borderColor: alpha(theme.palette.primary.main, 0.2),
+                '&:hover': {
+                  borderColor: theme.palette.primary.main,
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                },
+              }}
+            >
+              Search Label on Google
+            </Button>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<DescriptionIcon />}
+              endIcon={<OpenInNewIcon sx={{ fontSize: '14px !important' }} />}
+              href="https://portal.apvma.gov.au/pubcris"
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                fontWeight: 600,
+                borderColor: alpha('#7b3fa0', 0.3),
+                color: '#7b3fa0',
+                '&:hover': {
+                  borderColor: '#7b3fa0',
+                  bgcolor: alpha('#7b3fa0', 0.04),
+                },
+              }}
+            >
+              APVMA Register
+            </Button>
+          </Box>
         )}
       </Box>
 
@@ -256,7 +280,7 @@ export default function TreatmentDetail() {
                     <Typography variant="body1" fontWeight={700}>{treatment.droneParams.flightHeightM}</Typography>
                   } />
                   <DetailRow label="Speed" value={
-                    <Typography variant="body1" fontWeight={700}>{treatment.droneParams.speedMs}</Typography>
+                    <Typography variant="body1" fontWeight={700}>{formatSpeedWithKmh(treatment.droneParams.speedMs)}</Typography>
                   } />
                 </TableBody>
               </Table>
@@ -290,6 +314,58 @@ export default function TreatmentDetail() {
             <Typography variant="body1" fontWeight={600} sx={{ lineHeight: 1.6 }}>
               {treatment.adjuvantNotes}
             </Typography>
+          </SectionCard>
+        </Grid>
+
+        {/* State & Season Applicability */}
+        <Grid size={{ xs: 12 }}>
+          <SectionCard title="State & Season Applicability" icon={<PlaceIcon />} color="#3a6b7a">
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                  <PlaceIcon sx={{ fontSize: 16, color: '#3a6b7a' }} />
+                  <Typography variant="subtitle2" sx={{ color: '#3a6b7a' }}>Registered States</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                  {getStatesForTreatment(treatment).map((state) => (
+                    <Box key={state} sx={{
+                      px: 1.5, py: 0.5, borderRadius: '8px',
+                      bgcolor: alpha('#3a6b7a', 0.08),
+                      border: `1px solid ${alpha('#3a6b7a', 0.15)}`,
+                    }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#3a6b7a' }}>{state}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+                {treatment.states && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    This treatment has state-specific restrictions. Check label for details.
+                  </Typography>
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                  <CalendarMonthIcon sx={{ fontSize: 16, color: '#3a6b7a' }} />
+                  <Typography variant="subtitle2" sx={{ color: '#3a6b7a' }}>Application Season</Typography>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 0.75, flexWrap: 'wrap' }}>
+                  {getSeasonsForTreatment(treatment).map((season) => (
+                    <Box key={season} sx={{
+                      px: 1.5, py: 0.5, borderRadius: '8px',
+                      bgcolor: alpha('#2e9e3c', 0.08),
+                      border: `1px solid ${alpha('#2e9e3c', 0.15)}`,
+                    }}>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: '#2e9e3c' }}>{season}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+                {getSeasonsForTreatment(treatment).length < 4 && (
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                    Best results during these seasons. Always confirm timing on the product label.
+                  </Typography>
+                )}
+              </Grid>
+            </Grid>
           </SectionCard>
         </Grid>
       </Grid>

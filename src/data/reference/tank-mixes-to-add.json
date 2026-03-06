@@ -1,6 +1,6 @@
 [
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Parthenium weed",
     "recipes": [
       {
@@ -33,7 +33,7 @@
     ]
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Rubber vine",
     "recipes": [
       {
@@ -66,7 +66,7 @@
     ]
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Paterson's curse",
     "recipes": [
       {
@@ -99,7 +99,7 @@
     ]
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Scotch thistle / spear thistle / variegated thistle",
     "recipes": [
       {
@@ -132,7 +132,7 @@
     ]
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Fallow weeds (general)",
     "recipes": [
       {
@@ -168,7 +168,7 @@
     ]
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Giant Parramatta grass",
     "recipes": [
       {
@@ -201,7 +201,7 @@
     ]
   },
   {
-    "_status": "READY",
+    "_status": "ADDED",
     "weed": "Coolatai grass",
     "recipes": [
       {

@@ -17,7 +17,10 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import DescriptionIcon from '@mui/icons-material/Description';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import PublicIcon from '@mui/icons-material/Public';
+import PlaceIcon from '@mui/icons-material/Place';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { WeedTreatment } from '../types/chemical';
+import { getSeasonsForTreatment, getStatesForTreatment } from '../data/chemicals';
 import DroneStatusChip from './DroneStatusChip';
 
 export default function ChemicalCard({ treatment }: { treatment: WeedTreatment }) {
@@ -122,6 +125,21 @@ export default function ChemicalCard({ treatment }: { treatment: WeedTreatment }
               <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.3 }}>
                 {treatment.bestTiming}
               </Typography>
+            </Box>
+            {/* State & Season tags */}
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', pt: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <PlaceIcon sx={{ fontSize: 13, color: alpha(theme.palette.text.secondary, 0.5) }} />
+                <Typography variant="caption" sx={{ color: alpha(theme.palette.text.secondary, 0.7), fontWeight: 600, fontSize: '0.65rem' }}>
+                  {treatment.states ? treatment.states.join(', ') : 'All states'}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <CalendarMonthIcon sx={{ fontSize: 13, color: alpha(theme.palette.text.secondary, 0.5) }} />
+                <Typography variant="caption" sx={{ color: alpha(theme.palette.text.secondary, 0.7), fontWeight: 600, fontSize: '0.65rem' }}>
+                  {getSeasonsForTreatment(treatment).join(', ')}
+                </Typography>
+              </Box>
             </Box>
           </Stack>
 

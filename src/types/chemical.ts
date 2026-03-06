@@ -6,6 +6,13 @@ export type DroneStatus =
   | 'not-permitted'
   | 'not-permitted-aquatic';
 
+export type AustralianState = 'NSW' | 'VIC' | 'QLD' | 'SA' | 'WA' | 'TAS' | 'NT' | 'ACT';
+
+export type Season = 'Spring' | 'Summer' | 'Autumn' | 'Winter';
+
+export const ALL_STATES: AustralianState[] = ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'];
+export const ALL_SEASONS: Season[] = ['Spring', 'Summer', 'Autumn', 'Winter'];
+
 export interface DroneFlightParams {
   dropletSize: string;
   flightHeightM: string;
@@ -26,6 +33,10 @@ export interface WeedTreatment {
   droneParams: DroneFlightParams | null;
   bestTiming: string;
   adjuvantNotes: string;
+  /** Australian states where this treatment is registered. Undefined = all states. */
+  states?: AustralianState[];
+  /** Best application seasons. Undefined = year-round / per label. */
+  season?: Season[];
   source?: TreatmentSource;
   apvmaNumber?: string;
   registrant?: string;

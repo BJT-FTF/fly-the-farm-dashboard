@@ -22,8 +22,9 @@ import {
   Stack,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import SearchIcon from '@mui/icons-material/Search';
+import HomeIcon from '@mui/icons-material/Home';
+import GrassIcon from '@mui/icons-material/Grass';
+import CalculateIcon from '@mui/icons-material/Calculate';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
@@ -45,8 +46,9 @@ export default function Layout() {
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/', icon: <DashboardIcon /> },
-    { label: 'Search', path: '/search', icon: <SearchIcon /> },
+    { label: 'Home', path: '/', icon: <HomeIcon /> },
+    { label: 'Database', path: '/database', icon: <GrassIcon /> },
+    { label: 'Calculator', path: '/calculator', icon: <CalculateIcon /> },
   ];
 
   return (

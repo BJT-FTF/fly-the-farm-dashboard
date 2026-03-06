@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatSpeedWithKmh } from '../utils/speedConvert';
 import {
   Typography,
   Box,
@@ -163,7 +164,7 @@ export default function WeedRecommendations({ query, treatments }: Props) {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                           <SpeedIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
                           <Typography variant="caption">
-                            <strong>Drone:</strong> {treatment.droneParams.flightHeightM} @ {treatment.droneParams.speedMs}
+                            <strong>Drone:</strong> {treatment.droneParams.flightHeightM} @ {formatSpeedWithKmh(treatment.droneParams.speedMs)}
                           </Typography>
                         </Box>
                       )}
@@ -185,7 +186,7 @@ export default function WeedRecommendations({ query, treatments }: Props) {
                             sx={{ fontSize: '0.7rem', height: 24 }} />
                           <Chip label={treatment.droneParams.flightHeightM} size="small" variant="outlined"
                             sx={{ fontSize: '0.7rem', height: 24 }} />
-                          <Chip label={treatment.droneParams.speedMs} size="small" variant="outlined"
+                          <Chip label={formatSpeedWithKmh(treatment.droneParams.speedMs)} size="small" variant="outlined"
                             sx={{ fontSize: '0.7rem', height: 24 }} />
                         </Box>
                       </>

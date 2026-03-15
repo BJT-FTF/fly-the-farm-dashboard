@@ -1,0 +1,8 @@
+Name,Phone,Email,Address,Town,State,Postcode,Property Name,Field Name,Hectares,Notes
+John Smith,0412 345 678,john@smithfarms.com.au,123 Farm Road,Moree,NSW,2400,Smith Station,North Paddock,500,Wheat country
+John Smith,,,,,,,Smith Station,South Paddock,350,Canola rotation
+John Smith,,,,Narrabri,NSW,2390,River Block,River Flat,200,Grazing - flood prone
+Sarah Jones,0423 456 789,sarah@jonesproperties.com,45 Range Road,Dalby,QLD,4405,Dovetail Downs,Home Paddock,800,Mixed farming
+Sarah Jones,,,,,,,Dovetail Downs,Back Paddock,600,
+Sarah Jones,,,,Cecil Plains,QLD,4407,Plains Country,Big Flat,1200,Summer crop country
+Bruce Williams,0434 567 890,bruce@bigpaddock.com.au,,Wagga Wagga,NSW,2650,,,,"New client - no properties yet"

@@ -9,18 +9,25 @@ import {
   Typography,
   Alert,
   Link,
+  ToggleButton,
+  ToggleButtonGroup,
   alpha,
   useTheme,
 } from '@mui/material';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import PersonIcon from '@mui/icons-material/Person';
 import { useAuth } from '../contexts/AuthContext';
+import { UserRole } from '../contexts/AuthContext';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('contractor');
+  const [contractorCode, setContractorCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -39,12 +46,12 @@ export default function Register() {
       return;
     }
     setLoading(true);
-    const success = await register(email, name, password);
+    const result = await register(email, name, password, role, contractorCode || undefined);
     setLoading(false);
-    if (success) {
+    if (result.success) {
       navigate('/');
     } else {
-      setError('An account with this email already exists.');
+      setError(result.error || 'Registration failed.');
     }
   };
 
@@ -78,7 +85,7 @@ export default function Register() {
       <Card
         className="ftf-animate-in"
         sx={{
-          maxWidth: 440,
+          maxWidth: 480,
           width: '100%',
           position: 'relative',
           zIndex: 1,
@@ -88,7 +95,7 @@ export default function Register() {
         }}
       >
         <CardContent sx={{ p: { xs: 3, sm: 4.5 } }}>
-          <Box sx={{ textAlign: 'center', mb: 4 }}>
+          <Box sx={{ textAlign: 'center', mb: 3 }}>
             <Box
               component="img"
               src="/logo.png"
@@ -103,11 +110,48 @@ export default function Register() {
             </Typography>
           </Box>
 
+          {/* Role Selection */}
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mb: 1, textAlign: 'center' }}>
+              I am a...
+            </Typography>
+            <ToggleButtonGroup
+              value={role}
+              exclusive
+              onChange={(_e, val) => { if (val) setRole(val); }}
+              fullWidth
+              sx={{
+                '& .MuiToggleButton-root': {
+                  py: 1.5,
+                  fontWeight: 700,
+                  fontSize: '0.9rem',
+                  borderRadius: '10px !important',
+                  border: `1.5px solid ${alpha(theme.palette.primary.main, 0.15)} !important`,
+                  mx: 0.5,
+                },
+                '& .Mui-selected': {
+                  bgcolor: `${alpha(theme.palette.primary.main, 0.08)} !important`,
+                  color: `${theme.palette.primary.main} !important`,
+                  borderColor: `${alpha(theme.palette.primary.main, 0.4)} !important`,
+                },
+              }}
+            >
+              <ToggleButton value="contractor">
+                <FlightTakeoffIcon sx={{ mr: 1, fontSize: 20 }} />
+                Spray Contractor
+              </ToggleButton>
+              <ToggleButton value="client">
+                <AgricultureIcon sx={{ mr: 1, fontSize: 20 }} />
+                Landowner / Client
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
+
           {error && <Alert severity="error" sx={{ mb: 2.5 }}>{error}</Alert>}
 
           <Box component="form" onSubmit={handleSubmit}>
             <TextField
-              label="Full Name"
+              label={role === 'contractor' ? 'Business / Operator Name' : 'Full Name'}
               fullWidth
               required
               value={name}
@@ -123,6 +167,23 @@ export default function Register() {
               onChange={(e) => setEmail(e.target.value)}
               sx={{ mb: 2 }}
             />
+
+            {role === 'client' && (
+              <TextField
+                label="Contractor Code"
+                fullWidth
+                required
+                value={contractorCode}
+                onChange={(e) => setContractorCode(e.target.value.toUpperCase())}
+                placeholder="e.g. ABC123"
+                helperText="Ask your spray contractor for their invite code"
+                sx={{ mb: 2 }}
+                slotProps={{
+                  input: { sx: { fontFamily: 'monospace', fontWeight: 700, letterSpacing: '0.1em' } },
+                }}
+              />
+            )}
+
             <TextField
               label="Password"
               type="password"

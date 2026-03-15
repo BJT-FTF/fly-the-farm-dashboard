@@ -19,6 +19,8 @@ import {
   TableRow,
   IconButton,
   Divider,
+  Snackbar,
+  Alert,
   alpha,
   useTheme,
   Paper,
@@ -31,6 +33,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import SendIcon from '@mui/icons-material/Send';
 
 const CHEMICAL_OPTIONS = [
   'Grazon Extra',
@@ -89,6 +92,7 @@ export default function Calculator() {
     createRow(),
     createRow(),
   ]);
+  const [exportSnackbar, setExportSnackbar] = useState(false);
 
   // ── Core formulas ──
   // Total spray mix for the entire job
@@ -121,6 +125,33 @@ export default function Calculator() {
   };
 
   const hasChemicals = chemicals.some((r) => r.name && r.ratePerHa > 0);
+
+  const handleExportToJob = () => {
+    const validChems = chemicals.filter((r) => r.name && r.ratePerHa > 0);
+    if (validChems.length === 0) return;
+    const payload = {
+      chemicals: validChems.map((r) => ({
+        name: r.name,
+        unit: r.unit,
+        ratePerHa: r.ratePerHa,
+        perBatch: r.ratePerHa * hectaresPerBatch,
+        totalJob: r.ratePerHa * hectares,
+      })),
+      waterRateLHa: applicationRate,
+      batchInfo: {
+        hectares,
+        applicationRateLHa: applicationRate,
+        tankSizeL: tankSize,
+        totalSprayVolumeL: totalSprayVolume,
+        totalBatches: Math.ceil(totalBatches),
+        hectaresPerBatch,
+        waterPerBatchL: waterPerBatch,
+      },
+      exportedAt: new Date().toISOString(),
+    };
+    localStorage.setItem('ftf_calc_export', JSON.stringify(payload));
+    setExportSnackbar(true);
+  };
 
   return (
     <Box>
@@ -454,6 +485,23 @@ export default function Calculator() {
         </Box>
       )}
 
+      {/* Export to Job */}
+      {hasChemicals && (
+        <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Button
+            variant="contained"
+            startIcon={<SendIcon />}
+            onClick={handleExportToJob}
+            sx={{ borderRadius: '10px', px: 4, fontWeight: 700 }}
+          >
+            Export Brew to Job
+          </Button>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+            Saves this brew so it pre-fills when you create a new spray job
+          </Typography>
+        </Box>
+      )}
+
       {/* Disclaimer */}
       <Box sx={{ mt: 3, mb: 2, textAlign: 'center' }}>
         <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.6 }}>
@@ -461,6 +509,17 @@ export default function Calculator() {
           Check label compatibility before tank mixing multiple products.
         </Typography>
       </Box>
+
+      <Snackbar
+        open={exportSnackbar}
+        autoHideDuration={4000}
+        onClose={() => setExportSnackbar(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setExportSnackbar(false)} severity="success" sx={{ borderRadius: '10px', fontWeight: 600 }}>
+          Brew exported — it will pre-fill your next new spray job
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

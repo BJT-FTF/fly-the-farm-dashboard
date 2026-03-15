@@ -25,10 +25,26 @@ import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import GrassIcon from '@mui/icons-material/Grass';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { useAuth } from '../contexts/AuthContext';
+import { Chip } from '@mui/material';
+
+const ROLE_LABELS: Record<string, string> = {
+  admin: 'FTF Admin',
+  contractor: 'Contractor',
+  client: 'Client',
+};
+
+const ROLE_COLORS: Record<string, string> = {
+  admin: '#ff9800',
+  contractor: '#4caf50',
+  client: '#2196f3',
+};
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -46,10 +62,13 @@ export default function Layout() {
   };
 
   const navItems = [
-    { label: 'Home', path: '/', icon: <HomeIcon /> },
-    { label: 'Database', path: '/database', icon: <GrassIcon /> },
-    { label: 'Calculator', path: '/calculator', icon: <CalculateIcon /> },
-  ];
+    { label: 'Home', path: '/', icon: <HomeIcon />, roles: ['admin', 'contractor', 'client'] },
+    { label: 'Database', path: '/database', icon: <GrassIcon />, roles: ['admin', 'contractor', 'client'] },
+    { label: 'Calculator', path: '/calculator', icon: <CalculateIcon />, roles: ['admin', 'contractor'] },
+    { label: 'Jobs', path: '/jobs', icon: <AssignmentIcon />, roles: ['admin', 'contractor', 'client'] },
+    { label: 'Quotes', path: '/quotes', icon: <ReceiptLongIcon />, roles: ['admin', 'contractor'] },
+    { label: 'Admin', path: '/admin', icon: <AdminPanelSettingsIcon />, roles: ['admin'] },
+  ].filter((item) => !user?.role || item.roles.includes(user.role));
 
   return (
     <Box className="ftf-grain" sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -157,7 +176,16 @@ export default function Layout() {
                     Account
                   </Typography>
                   <Typography variant="body2" fontWeight={600}>{user.name}</Typography>
-                  <Typography variant="caption" color="text.secondary">{user.email}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{user.email}</Typography>
+                  <Chip
+                    label={ROLE_LABELS[user.role] || user.role}
+                    size="small"
+                    sx={{
+                      mt: 0.75, fontWeight: 700, fontSize: '0.65rem', height: 20,
+                      bgcolor: alpha(ROLE_COLORS[user.role] || '#999', 0.1),
+                      color: ROLE_COLORS[user.role] || '#999',
+                    }}
+                  />
                 </Box>
                 <Divider />
                 <MenuItem

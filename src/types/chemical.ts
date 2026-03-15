@@ -1,3 +1,5 @@
+export type ChemicalCategory = 'herbicide' | 'insecticide' | 'fungicide' | 'pesticide';
+
 export type DroneStatus =
   | 'permitted'
   | 'permitted-helicopter-caution'
@@ -23,6 +25,8 @@ export type TreatmentSource = 'curated' | 'apvma-auto';
 
 export interface WeedTreatment {
   id: string;
+  category?: ChemicalCategory;
+  /** For herbicides: target weed. For others: target pest/disease/general use. */
   weed: string;
   brands: string;
   activeIngredient: string;

@@ -9,6 +9,19 @@ import Dashboard from './pages/Dashboard';
 import SearchResults from './pages/SearchResults';
 import TreatmentDetail from './pages/TreatmentDetail';
 import Calculator from './pages/Calculator';
+import ClientList from './pages/ClientList';
+import ClientDetail from './pages/ClientDetail';
+import PropertyDetail from './pages/PropertyDetail';
+import FieldDetail from './pages/FieldDetail';
+import JobCreate from './pages/JobCreate';
+import JobDetail from './pages/JobDetail';
+import JobHistory from './pages/JobHistory';
+import SprayRecImport from './pages/SprayRecImport';
+import Admin from './pages/Admin';
+import QuoteList from './pages/QuoteList';
+import QuoteCreate from './pages/QuoteCreate';
+import QuoteDetail from './pages/QuoteDetail';
+import QuoteSettings from './pages/QuoteSettings';
 
 function App() {
   return (
@@ -28,6 +41,19 @@ function App() {
           <Route path="/search" element={<SearchResults />} />
           <Route path="/treatment/:id" element={<TreatmentDetail />} />
           <Route path="/calculator" element={<Calculator />} />
+          <Route path="/jobs" element={<ClientList />} />
+          <Route path="/jobs/import" element={<SprayRecImport />} />
+          <Route path="/jobs/history" element={<JobHistory />} />
+          <Route path="/jobs/client/:clientId" element={<ClientDetail />} />
+          <Route path="/jobs/client/:clientId/property/:propertyId" element={<PropertyDetail />} />
+          <Route path="/jobs/client/:clientId/property/:propertyId/field/:fieldId" element={<FieldDetail />} />
+          <Route path="/jobs/client/:clientId/property/:propertyId/field/:fieldId/new-job" element={<JobCreate />} />
+          <Route path="/jobs/client/:clientId/property/:propertyId/field/:fieldId/job/:jobId" element={<JobDetail />} />
+          <Route path="/quotes" element={<QuoteList />} />
+          <Route path="/quotes/new" element={<QuoteCreate />} />
+          <Route path="/quotes/settings" element={<QuoteSettings />} />
+          <Route path="/quotes/:quoteId" element={<QuoteDetail />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
     </BrowserRouter>

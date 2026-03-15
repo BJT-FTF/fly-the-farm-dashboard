@@ -1,5 +1,8 @@
 import { WeedTreatment, AustralianState, Season, ALL_STATES, ALL_SEASONS } from '../types/chemical';
 import { getSavedChemicals } from '../services/savedChemicals';
+import { insecticides } from './insecticides';
+import { fungicides } from './fungicides';
+import { pesticides } from './pesticides';
 
 /**
  * Derive applicable seasons from bestTiming text.
@@ -32,8 +35,14 @@ export function getStatesForTreatment(t: WeedTreatment): AustralianState[] {
   return t.states || [...ALL_STATES];
 }
 
+/** Normalize text for fuzzy matching — strip spaces, hyphens, and common variations */
+function fuzzyMatch(text: string, query: string): boolean {
+  const normalize = (s: string) => s.toLowerCase().replace(/[\s\-_''`.,()]/g, '');
+  return normalize(text).includes(normalize(query)) || text.toLowerCase().includes(query.toLowerCase());
+}
+
 function getAllTreatments(): WeedTreatment[] {
-  return [...treatments, ...getSavedChemicals()];
+  return [...treatments, ...insecticides, ...fungicides, ...pesticides, ...getSavedChemicals()];
 }
 
 const defaultDroneParams = {
@@ -64,6 +73,7 @@ const LABEL_URLS: Record<string, string> = {
 export const treatments: WeedTreatment[] = [
   {
     id: 'blackberry-grazon-extra-1',
+    category: 'herbicide',
     weed: 'Blackberry',
     brands: 'Grazon Extra (triclopyr+picloram+aminopyralid)',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -78,6 +88,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'blackberry-grazon-extra-2',
+    category: 'herbicide',
     weed: 'Blackberry',
     brands: 'Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -92,6 +103,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'madeira-vine-grazon-extra',
+    category: 'herbicide',
     weed: 'Madeira vine',
     brands: 'Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -108,6 +120,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'st-johns-wort-grazon-extra',
+    category: 'herbicide',
     weed: "St John's wort",
     brands: 'Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -122,6 +135,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'fireweed-grazon-extra',
+    category: 'herbicide',
     weed: 'Fireweed',
     brands: 'Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -138,6 +152,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'lantana-grazon-extra',
+    category: 'herbicide',
     weed: 'Lantana',
     brands: 'Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -152,6 +167,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'giant-rats-tail-grass-taskforce',
+    category: 'herbicide',
     weed: "Giant rat's tail grass",
     brands: 'Taskforce 745',
     activeIngredient: 'Flupropanate 745g/L',
@@ -168,6 +184,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'serrated-tussock-taskforce',
+    category: 'herbicide',
     weed: 'Serrated tussock',
     brands: 'Taskforce 745',
     activeIngredient: 'Flupropanate 745g/L',
@@ -184,6 +201,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'african-lovegrass-taskforce',
+    category: 'herbicide',
     weed: 'African lovegrass',
     brands: 'Taskforce 745',
     activeIngredient: 'Flupropanate 745g/L',
@@ -200,6 +218,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'chilean-needle-grass-taskforce',
+    category: 'herbicide',
     weed: 'Chilean needle grass',
     brands: 'Taskforce 745 (+/- glyphosate)',
     activeIngredient: 'Flupropanate 745g/L (+/- Glyphosate)',
@@ -216,6 +235,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'mimosa-pigra-metsulfuron',
+    category: 'herbicide',
     weed: 'Mimosa pigra',
     brands: 'Metsulfuron 600 WG (Associate, etc.)',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -232,6 +252,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'blackberry-metsulfuron',
+    category: 'herbicide',
     weed: 'Blackberry',
     brands: 'Metsulfuron 600 WG',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -246,6 +267,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'parkinsonia-tebuthiuron',
+    category: 'herbicide',
     weed: 'Parkinsonia',
     brands: 'Graslan Aerial / Valpar / other tebuthiuron pellets',
     activeIngredient: 'Tebuthiuron',
@@ -261,6 +283,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'prickly-acacia-tebuthiuron',
+    category: 'herbicide',
     weed: 'Prickly acacia',
     brands: 'Graslan Aerial / Valpar / other tebuthiuron pellets',
     activeIngredient: 'Tebuthiuron',
@@ -276,6 +299,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'mesquite-tebuthiuron',
+    category: 'herbicide',
     weed: 'Mesquite',
     brands: 'Graslan Aerial / Valpar / other tebuthiuron pellets',
     activeIngredient: 'Tebuthiuron',
@@ -291,6 +315,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'african-boxthorn-tebuthiuron',
+    category: 'herbicide',
     weed: 'African boxthorn',
     brands: 'Graslan Aerial / Valpar / other tebuthiuron pellets',
     activeIngredient: 'Tebuthiuron',
@@ -306,6 +331,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'prickly-apple-tebuthiuron',
+    category: 'herbicide',
     weed: 'Prickly apple regrowth',
     brands: 'Graslan Aerial / Valpar / other tebuthiuron pellets',
     activeIngredient: 'Tebuthiuron',
@@ -321,6 +347,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'water-hyacinth-glyphosate-aquatic',
+    category: 'herbicide',
     weed: 'Water hyacinth',
     brands: 'Glyphosate aquatic (Roundup Biactive / Weedmaster Duo)',
     activeIngredient: 'Glyphosate (aquatic formulation)',
@@ -337,6 +364,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'salvinia-glyphosate-aquatic',
+    category: 'herbicide',
     weed: 'Salvinia',
     brands: 'Glyphosate aquatic (Roundup Biactive / Weedmaster Duo)',
     activeIngredient: 'Glyphosate (aquatic formulation)',
@@ -353,6 +381,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'cabomba-glyphosate-aquatic',
+    category: 'herbicide',
     weed: 'Cabomba / Hydrilla / Elodea',
     brands: 'Glyphosate aquatic (Roundup Biactive / Weedmaster Duo)',
     activeIngredient: 'Glyphosate (aquatic formulation)',
@@ -369,6 +398,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'alligator-weed-glyphosate-aquatic',
+    category: 'herbicide',
     weed: 'Alligator weed',
     brands: 'Glyphosate aquatic (Roundup Biactive / Weedmaster Duo)',
     activeIngredient: 'Glyphosate (aquatic formulation)',
@@ -385,6 +415,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'woody-regrowth-fallow-garlon',
+    category: 'herbicide',
     weed: 'General woody regrowth (fallow)',
     brands: 'Garlon 600 (triclopyr 600)',
     activeIngredient: 'Triclopyr 600g/L',
@@ -399,6 +430,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'tobacco-tree-grazon-extra',
+    category: 'herbicide',
     weed: 'Tobacco tree',
     brands: 'Grazon Extra (ground)',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -415,6 +447,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'calotropis-tebuthiuron',
+    category: 'herbicide',
     weed: 'Calotropis (Rubber bush)',
     brands: 'Garlon 600 / Starane Advanced (ground); Tebuthiuron pellets',
     activeIngredient: 'Triclopyr / Fluroxypyr (ground); Tebuthiuron (aerial)',
@@ -430,6 +463,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'blackberry-alt-hotshot-grazon',
+    category: 'herbicide',
     weed: 'Blackberry (alt. brands)',
     brands: 'Hotshot (ground); Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -444,6 +478,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'madeira-vine-alt-hotshot-grazon',
+    category: 'herbicide',
     weed: 'Madeira vine (alt. brands)',
     brands: 'Hotshot (ground); Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -460,6 +495,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'gorse-tas-grazon-extra',
+    category: 'herbicide',
     weed: 'Gorse (TAS helicopter)',
     brands: 'Grazon Extra',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -475,6 +511,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'camphor-laurel-grazon-extra',
+    category: 'herbicide',
     weed: 'Camphor laurel',
     brands: 'Grazon Extra (ground)',
     activeIngredient: 'Triclopyr + Picloram + Aminopyralid',
@@ -495,6 +532,7 @@ export const treatments: WeedTreatment[] = [
   // Glyphosate 450 — fallow/general knockdown
   {
     id: 'fallow-glyphosate-450',
+    category: 'herbicide',
     weed: 'Fallow / general knockdown',
     brands: 'Roundup PowerMAX / Weedmaster DST / Glyphosate 450',
     activeIngredient: 'Glyphosate 450g/L',
@@ -511,6 +549,7 @@ export const treatments: WeedTreatment[] = [
   // 2,4-D Amine — pasture broadleaf
   {
     id: 'pasture-broadleaf-2-4-d',
+    category: 'herbicide',
     weed: 'Thistles / Paterson\'s curse / capeweed',
     brands: 'Amicide Advance 700 / Surpass 480 / 2,4-D Amine 625',
     activeIngredient: '2,4-D Amine 625–700g/L',
@@ -527,6 +566,7 @@ export const treatments: WeedTreatment[] = [
   // MCPA 750 — pasture broadleaf
   {
     id: 'pasture-broadleaf-mcpa',
+    category: 'herbicide',
     weed: 'Thistles / capeweed / dock / sorrel',
     brands: 'MCPA 750 / Agritone 750',
     activeIngredient: 'MCPA 750g/L',
@@ -543,6 +583,7 @@ export const treatments: WeedTreatment[] = [
   // Fluroxypyr 333 — broadleaf selective
   {
     id: 'pasture-broadleaf-fluroxypyr',
+    category: 'herbicide',
     weed: 'Thistles / bindweed / woody seedlings',
     brands: 'Starane Advanced / Comet 333 / Flagship 333',
     activeIngredient: 'Fluroxypyr 333g/L',
@@ -559,6 +600,7 @@ export const treatments: WeedTreatment[] = [
   // Dicamba — broadleaf (drift-sensitive)
   {
     id: 'pasture-broadleaf-dicamba',
+    category: 'herbicide',
     weed: 'Thistles / dock / hardheads / bindweed',
     brands: 'Kamba 750 / Dicamba 700',
     activeIngredient: 'Dicamba 700–750g/L',
@@ -575,6 +617,7 @@ export const treatments: WeedTreatment[] = [
   // Imazapyr 250 — woody weeds / total veg
   {
     id: 'woody-imazapyr',
+    category: 'herbicide',
     weed: 'Rubber vine / woody weeds / total vegetation',
     brands: 'Arsenal Xpress / OnDuty / Imazapyr 250',
     activeIngredient: 'Imazapyr 250g/L',
@@ -591,6 +634,7 @@ export const treatments: WeedTreatment[] = [
   // Clopyralid — thistles (Asteraceae specialist)
   {
     id: 'thistles-clopyralid',
+    category: 'herbicide',
     weed: 'Scotch thistle / spear thistle / variegated thistle',
     brands: 'Lontrel 300 / Archer 300 / Clopyralid 300',
     activeIngredient: 'Clopyralid 300g/L',
@@ -608,6 +652,7 @@ export const treatments: WeedTreatment[] = [
   // Parthenium — 2,4-D
   {
     id: 'parthenium-2-4-d',
+    category: 'herbicide',
     weed: 'Parthenium weed',
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -626,6 +671,7 @@ export const treatments: WeedTreatment[] = [
   // Parthenium — metsulfuron
   {
     id: 'parthenium-metsulfuron',
+    category: 'herbicide',
     weed: 'Parthenium weed',
     brands: 'Metsulfuron 600 WG / Associate / Brush-Off',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -644,6 +690,7 @@ export const treatments: WeedTreatment[] = [
   // Rubber vine — triclopyr
   {
     id: 'rubber-vine-triclopyr',
+    category: 'herbicide',
     weed: 'Rubber vine',
     brands: 'Garlon 600 / Access (triclopyr+picloram)',
     activeIngredient: 'Triclopyr 600g/L (or Triclopyr + Picloram)',
@@ -662,6 +709,7 @@ export const treatments: WeedTreatment[] = [
   // Rubber vine — imazapyr
   {
     id: 'rubber-vine-imazapyr',
+    category: 'herbicide',
     weed: 'Rubber vine',
     brands: 'Arsenal Xpress / Imazapyr 250',
     activeIngredient: 'Imazapyr 250g/L',
@@ -680,6 +728,7 @@ export const treatments: WeedTreatment[] = [
   // Bellyache bush — triclopyr
   {
     id: 'bellyache-bush-triclopyr',
+    category: 'herbicide',
     weed: 'Bellyache bush',
     brands: 'Garlon 600 / Grazon Extra',
     activeIngredient: 'Triclopyr 600g/L (or Triclopyr + Picloram + Aminopyralid)',
@@ -698,6 +747,7 @@ export const treatments: WeedTreatment[] = [
   // Paterson's curse — 2,4-D
   {
     id: 'patersons-curse-2-4-d',
+    category: 'herbicide',
     weed: "Paterson's curse",
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -715,6 +765,7 @@ export const treatments: WeedTreatment[] = [
   // Paterson's curse — metsulfuron
   {
     id: 'patersons-curse-metsulfuron',
+    category: 'herbicide',
     weed: "Paterson's curse",
     brands: 'Metsulfuron 600 WG / Associate / Brush-Off',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -732,6 +783,7 @@ export const treatments: WeedTreatment[] = [
   // Giant Parramatta grass — taskforce
   {
     id: 'giant-parramatta-grass-taskforce',
+    category: 'herbicide',
     weed: 'Giant Parramatta grass',
     brands: 'Taskforce 745',
     activeIngredient: 'Flupropanate 745g/L',
@@ -750,6 +802,7 @@ export const treatments: WeedTreatment[] = [
   // Coolatai grass — taskforce
   {
     id: 'coolatai-grass-taskforce',
+    category: 'herbicide',
     weed: 'Coolatai grass',
     brands: 'Taskforce 745',
     activeIngredient: 'Flupropanate 745g/L',
@@ -768,6 +821,7 @@ export const treatments: WeedTreatment[] = [
   // Cat's claw creeper — triclopyr
   {
     id: 'cats-claw-creeper-triclopyr',
+    category: 'herbicide',
     weed: "Cat's claw creeper",
     brands: 'Garlon 600 / Grazon Extra',
     activeIngredient: 'Triclopyr 600g/L (or Triclopyr + Picloram + Aminopyralid)',
@@ -786,6 +840,7 @@ export const treatments: WeedTreatment[] = [
   // Groundsel bush — metsulfuron
   {
     id: 'groundsel-bush-metsulfuron',
+    category: 'herbicide',
     weed: 'Groundsel bush',
     brands: 'Metsulfuron 600 WG / Brush-Off',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -804,6 +859,7 @@ export const treatments: WeedTreatment[] = [
   // Bitou bush — metsulfuron
   {
     id: 'bitou-bush-metsulfuron',
+    category: 'herbicide',
     weed: 'Bitou bush',
     brands: 'Metsulfuron 600 WG / Brush-Off',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -822,6 +878,7 @@ export const treatments: WeedTreatment[] = [
   // Privet — triclopyr + metsulfuron
   {
     id: 'privet-triclopyr-metsulfuron',
+    category: 'herbicide',
     weed: 'Privet (broad-leaf / small-leaf)',
     brands: 'Garlon 600 + Metsulfuron 600 WG',
     activeIngredient: 'Triclopyr 600g/L + Metsulfuron-methyl 600g/kg',
@@ -842,6 +899,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet — Blackberry (aerial)
   {
     id: 'blackberry-hatchet',
+    category: 'herbicide',
     weed: 'Blackberry',
     brands: 'Hatchet (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
@@ -858,6 +916,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet — Lantana (aerial — helicopter/drone)
   {
     id: 'lantana-hatchet',
+    category: 'herbicide',
     weed: 'Lantana',
     brands: 'Hatchet (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
@@ -876,6 +935,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet — Gorse (aerial — helicopter TAS)
   {
     id: 'gorse-hatchet',
+    category: 'herbicide',
     weed: 'Gorse',
     brands: 'Hatchet (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
@@ -894,6 +954,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet — Rubber vine (aerial)
   {
     id: 'rubber-vine-hatchet',
+    category: 'herbicide',
     weed: 'Rubber vine',
     brands: 'Hatchet (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
@@ -912,6 +973,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet — St John's wort (aerial)
   {
     id: 'st-johns-wort-hatchet',
+    category: 'herbicide',
     weed: "St John's wort",
     brands: 'Hatchet (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
@@ -928,6 +990,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet — Crofton weed / Mistflower / Cockspur thorn (aerial)
   {
     id: 'crofton-weed-hatchet',
+    category: 'herbicide',
     weed: 'Crofton weed / Mistflower / Cockspur thorn',
     brands: 'Hatchet (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L',
@@ -948,6 +1011,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet Extra — Blackberry (aerial)
   {
     id: 'blackberry-hatchet-extra',
+    category: 'herbicide',
     weed: 'Blackberry',
     brands: 'Hatchet Extra (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
@@ -964,6 +1028,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet Extra — Lantana (aerial)
   {
     id: 'lantana-hatchet-extra',
+    category: 'herbicide',
     weed: 'Lantana',
     brands: 'Hatchet Extra (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
@@ -982,6 +1047,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet Extra — Rubber vine (aerial)
   {
     id: 'rubber-vine-hatchet-extra',
+    category: 'herbicide',
     weed: 'Rubber vine',
     brands: 'Hatchet Extra (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
@@ -1000,6 +1066,7 @@ export const treatments: WeedTreatment[] = [
   // Hatchet Extra — St John's wort (aerial)
   {
     id: 'st-johns-wort-hatchet-extra',
+    category: 'herbicide',
     weed: "St John's wort",
     brands: 'Hatchet Extra (Conquest)',
     activeIngredient: 'Triclopyr 300g/L + Picloram 100g/L + Aminopyralid 8g/L',
@@ -1016,6 +1083,7 @@ export const treatments: WeedTreatment[] = [
   // ── Thistles — 2,4-D specific entry ──
   {
     id: 'thistles-2-4-d',
+    category: 'herbicide',
     weed: 'Scotch thistle / spear thistle / variegated thistle',
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -1033,6 +1101,7 @@ export const treatments: WeedTreatment[] = [
   // ── Mother of millions ──
   {
     id: 'mother-of-millions-fluroxypyr',
+    category: 'herbicide',
     weed: 'Mother of millions',
     brands: 'Starane Advanced / Comet 333 / Flagship 333',
     activeIngredient: 'Fluroxypyr 333g/L',
@@ -1049,6 +1118,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'mother-of-millions-2-4-d',
+    category: 'herbicide',
     weed: 'Mother of millions',
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -1067,6 +1137,7 @@ export const treatments: WeedTreatment[] = [
   // ── Lippia ──
   {
     id: 'lippia-2-4-d',
+    category: 'herbicide',
     weed: 'Lippia',
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -1083,6 +1154,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'lippia-fluroxypyr',
+    category: 'herbicide',
     weed: 'Lippia',
     brands: 'Starane Advanced / Comet 333',
     activeIngredient: 'Fluroxypyr 333g/L',
@@ -1099,6 +1171,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'lippia-metsulfuron',
+    category: 'herbicide',
     weed: 'Lippia',
     brands: 'Metsulfuron 600 WG / Associate / Brush-Off',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -1117,6 +1190,7 @@ export const treatments: WeedTreatment[] = [
   // ── Dock (curled / broadleaf) ──
   {
     id: 'dock-2-4-d',
+    category: 'herbicide',
     weed: 'Dock (curled / broadleaf)',
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -1132,6 +1206,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'dock-mcpa',
+    category: 'herbicide',
     weed: 'Dock (curled / broadleaf)',
     brands: 'MCPA 750 / Agritone 750',
     activeIngredient: 'MCPA 750g/L',
@@ -1147,6 +1222,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'dock-dicamba',
+    category: 'herbicide',
     weed: 'Dock (curled / broadleaf)',
     brands: 'Kamba 750 / Dicamba 700',
     activeIngredient: 'Dicamba 700–750g/L',
@@ -1164,6 +1240,7 @@ export const treatments: WeedTreatment[] = [
   // ── Capeweed ──
   {
     id: 'capeweed-2-4-d',
+    category: 'herbicide',
     weed: 'Capeweed',
     brands: '2,4-D Amine 625 / Amicide Advance',
     activeIngredient: '2,4-D Amine 625g/L',
@@ -1180,6 +1257,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'capeweed-mcpa',
+    category: 'herbicide',
     weed: 'Capeweed',
     brands: 'MCPA 750 / Agritone 750',
     activeIngredient: 'MCPA 750g/L',
@@ -1196,6 +1274,7 @@ export const treatments: WeedTreatment[] = [
   },
   {
     id: 'capeweed-metsulfuron',
+    category: 'herbicide',
     weed: 'Capeweed',
     brands: 'Metsulfuron 600 WG / Associate / Brush-Off',
     activeIngredient: 'Metsulfuron-methyl 600g/kg',
@@ -1210,14 +1289,624 @@ export const treatments: WeedTreatment[] = [
     states: ['NSW', 'VIC', 'SA', 'WA', 'TAS'],
     labelUrl: LABEL_URLS['metsulfuron-600'],
   },
+
+  // ══════════════════════════════════════════════════════════════
+  // BROADACRE CROP HERBICIDES — Desiccation, Crop-topping, Fallow,
+  // In-Crop Selective, Pre-Emergent, Cotton, Sugarcane, Rice
+  // ══════════════════════════════════════════════════════════════
+
+  // ── Pre-Harvest Desiccation ──
+  {
+    id: 'desiccation-paraquat-chickpea',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Chickpea)',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.6–2.4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply when 80–90% of pods are brown/dry and seed moisture is below 14%. Non-systemic contact desiccant — kills green material on contact. Ensures even dry-down across the crop before harvest. Do NOT apply to crop intended for seed. Observe 7-day withholding period.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Do not add crop oils — may increase pod splitting. Ensure thorough coverage for contact activity.',
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+  {
+    id: 'desiccation-paraquat-canola',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Canola)',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.6–2.4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply when >80% seed colour change has occurred. Non-systemic — does not translocate to seed, so safe for grain quality. Facilitates even dry-down and reduces green seed contamination in sample. Observe 7-day withholding period.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Avoid application in windy conditions — paraquat is a contact herbicide requiring even coverage.',
+    season: ['Spring'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+  {
+    id: 'desiccation-diquat-canola',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Canola)',
+    brands: 'Reglone (Diquat)',
+    activeIngredient: 'Diquat 200g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '2–3 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply at 60–80% seed colour change. Contact desiccant — provides rapid burn-down of green material. Preferable to paraquat in some export markets due to MRL considerations. Observe 7-day withholding period.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Apply in sufficient water volume for thorough coverage. Diquat is light-activated — best results with daytime application.',
+    season: ['Spring'],
+    labelUrl: apvmaLabel('Reglone'),
+  },
+  {
+    id: 'desiccation-glufosinate-canola',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Canola)',
+    brands: 'Basta (Glufosinate-ammonium)',
+    activeIngredient: 'Glufosinate-ammonium 200g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '3–5 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply to InVigor (Liberty Link) canola ONLY at >60% seed colour change. Non-selective — contact activity with some translocation. Do not apply to non-LibertyLink varieties. Observe 7-day withholding period.',
+    adjuvantNotes: 'No additional surfactant required — formulation contains surfactant system. Ensure even coverage for contact activity.',
+    season: ['Spring'],
+    labelUrl: apvmaLabel('Basta'),
+  },
+  {
+    id: 'desiccation-saflufenacil-wheat',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Wheat/Barley)',
+    brands: 'Sharpen (Saflufenacil)',
+    activeIngredient: 'Saflufenacil 700g/kg',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '34 g/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Apply at hard dough stage (GS87+) when grain moisture is <30%. Contact desiccant — provides rapid burn-down of green stems and leaves. Particularly useful for uneven crops or those with late green tillers. Observe 7-day withholding period.',
+    adjuvantNotes: 'Add methylated seed oil (MSO) at 1% v/v (e.g. Hasten, Kwickin). MSO is essential for uptake — do not substitute NIS.',
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Sharpen'),
+  },
+  {
+    id: 'desiccation-paraquat-mungbean',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Mungbean)',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.6–2.4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply when 90% of pods are mature (brown/dry). Contact action — does not affect seed quality. Facilitates mechanical harvest by drying green stems and leaves evenly.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Thorough coverage essential for contact desiccation.',
+    season: ['Summer', 'Autumn'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+  {
+    id: 'desiccation-paraquat-lentil',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Lentil)',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.6–2.4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply when lower pods are brown and seed is at harvest moisture. Critical for even dry-down in indeterminate lentil crops where pods mature unevenly from bottom to top.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Even coverage critical in dense lentil canopy.',
+    season: ['Spring'],
+    states: ['VIC', 'SA', 'NSW'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+  {
+    id: 'desiccation-paraquat-sorghum',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Sorghum)',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.6–2.4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply at physiological maturity — black layer formation visible on grain. Dries green leaf and stems for harvest. Particularly useful when late rain delays natural dry-down.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Apply in calm conditions to ensure even coverage across tall canopy.',
+    season: ['Autumn'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+
+  // ── Crop-Topping (Pulses) ──
+  {
+    id: 'croptop-paraquat-lupins',
+    category: 'herbicide',
+    weed: 'Crop-Topping (Lupins)',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '400–800 mL/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Lower rate than full desiccation. Applied to control late-germinating weeds (annual ryegrass, brome grass) in maturing lupin crops. Apply when majority of pods are filled but before weed seed set. Prevents weed seed set and reduces weed seed bank.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Lower water volume acceptable as target is upper canopy weeds.',
+    season: ['Spring'],
+    states: ['WA', 'SA', 'VIC'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+  {
+    id: 'croptop-glyphosate-fieldpea',
+    category: 'herbicide',
+    weed: 'Crop-Topping (Field Pea)',
+    brands: 'Roundup PowerMAX (Glyphosate)',
+    activeIngredient: 'Glyphosate 540g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '500 mL–1 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Apply at 80%+ pod maturity to control weed seed set before harvest. Prevents annual ryegrass and brome grass from setting viable seed. Lower rate than full knockdown — targets annual grasses while crop is physiologically mature.',
+    adjuvantNotes: 'No additional adjuvant required for glyphosate 540 formulation. Ensure weeds are actively growing at application.',
+    season: ['Spring'],
+    states: ['WA', 'SA', 'VIC'],
+    labelUrl: apvmaLabel('Roundup PowerMAX'),
+  },
+
+  // ── Summer Fallow Knockdown ──
+  {
+    id: 'fallow-glyphosate-summer',
+    category: 'herbicide',
+    weed: 'Summer Fallow Knockdown',
+    brands: 'Roundup PowerMAX (Glyphosate)',
+    activeIngredient: 'Glyphosate 540g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.5–2.5 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Apply to actively growing summer weeds in fallow paddocks. Critical for conserving soil moisture before winter crop establishment. Target weed flushes after summer rainfall events. Double-knock with paraquat 7–10 days later for glyphosate-resistant annual ryegrass populations.',
+    adjuvantNotes: 'No additional adjuvant required for 540g/L formulation. For harder-to-kill weeds, consider adding LI 700 acidifier.',
+    season: ['Summer', 'Autumn'],
+    labelUrl: apvmaLabel('Roundup PowerMAX'),
+  },
+  {
+    id: 'fallow-paraquat-doubleknock',
+    category: 'herbicide',
+    weed: 'Summer Fallow Double-Knock',
+    brands: 'Gramoxone 250 (Paraquat)',
+    activeIngredient: 'Paraquat 250g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.6–2.4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply 7–10 days after initial glyphosate application as the second knock for glyphosate-resistant annual ryegrass. Contact burndown of survivors that escaped the first knock. Critical resistance management strategy — do not delay second application.',
+    adjuvantNotes: 'Non-ionic surfactant at label rate. Thorough coverage essential — paraquat is contact-only with no translocation.',
+    season: ['Summer', 'Autumn'],
+    labelUrl: apvmaLabel('Gramoxone'),
+  },
+  {
+    id: 'fallow-24d-broadleaf',
+    category: 'herbicide',
+    weed: 'Fallow Broadleaf Weed Control',
+    brands: 'Amicide 625 (2,4-D Amine)',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1–2 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Controls broadleaf weeds in fallow — fleabane, sowthistle, marshmallow, milk thistle, volunteer legumes. Apply to actively growing weeds at rosette stage for best results. Often tank-mixed with glyphosate for broad-spectrum fallow weed control.',
+    adjuvantNotes: 'Self-surfactant amine formulation — do not add oils. Observe plant-back periods before sowing sensitive crops (canola, legumes).',
+    season: ['Summer', 'Autumn'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+
+  // ── In-Crop Selective Herbicides (Cereals/Canola) ──
+  {
+    id: 'incrop-mcpa-cereals',
+    category: 'herbicide',
+    weed: 'In-Crop Broadleaf Control (Cereals)',
+    brands: 'MCPA 750 (MCPA)',
+    activeIngredient: 'MCPA 750g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '0.7–1.4 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Selective broadleaf herbicide in wheat, barley, and oats. Apply from 5-leaf stage to before first node (Z15–Z30). Controls capeweed, dock, thistles, marshmallow, and other winter broadleaf weeds. Crop-safe in cereals when applied within growth stage window. Classic cost-effective broadleaf option.',
+    adjuvantNotes: 'Most MCPA formulations are self-surfactant. Do not add crop oils. Avoid application during frost periods or when crop is stressed.',
+    season: ['Winter', 'Spring'],
+    labelUrl: apvmaLabel('MCPA'),
+  },
+  {
+    id: 'incrop-bromoxynil-cereals',
+    category: 'herbicide',
+    weed: 'In-Crop Broadleaf Control (Cereals)',
+    brands: 'Buctril MA (Bromoxynil + MCPA)',
+    activeIngredient: 'Bromoxynil 225g/L + MCPA 225g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.4 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Excellent broadleaf weed control in wheat, barley, oats. Apply Z13–Z25 (3-leaf to mid-tillering). Controls fumitory, deadnettle, capeweed, volunteer canola, and other broadleaf weeds. Dual mode of action — contact (bromoxynil) plus systemic (MCPA).',
+    adjuvantNotes: 'No additional surfactant required. Do not tank-mix with grass herbicides without checking compatibility. Avoid spraying crops under moisture stress.',
+    season: ['Winter', 'Spring'],
+    labelUrl: apvmaLabel('Buctril MA'),
+  },
+  {
+    id: 'incrop-clopyralid-canola',
+    category: 'herbicide',
+    weed: 'In-Crop Broadleaf Control (Canola)',
+    brands: 'Lontrel 300 (Clopyralid)',
+    activeIngredient: 'Clopyralid 300g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '200–300 mL/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Selective in canola — controls thistles, capeweed, volunteer legumes, marshmallow. Apply at 4–8 leaf canola stage. Excellent crop safety in all canola types. Systemic uptake with translocation to growing points.',
+    adjuvantNotes: 'No additional surfactant required. Can be tank-mixed with grass herbicides (e.g. haloxyfop) for one-pass broadleaf + grass control.',
+    season: ['Winter'],
+    labelUrl: apvmaLabel('Lontrel'),
+  },
+  {
+    id: 'incrop-haloxyfop-canola',
+    category: 'herbicide',
+    weed: 'In-Crop Grass Control (Canola)',
+    brands: 'Verdict 520 (Haloxyfop)',
+    activeIngredient: 'Haloxyfop 520g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '100–200 mL/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Selective grass herbicide safe in canola and legume crops. Controls annual ryegrass, wild oats, barley grass, and volunteer cereals. Apply when grasses are actively tillering (Z21–Z25) for best results. Excellent efficacy on ryegrass.',
+    adjuvantNotes: 'Add crop oil concentrate at 0.5% v/v or non-ionic surfactant at 0.25% v/v per label. Avoid mixing with broadleaf herbicides that may antagonise grass activity.',
+    season: ['Winter', 'Spring'],
+    labelUrl: apvmaLabel('Verdict'),
+  },
+  {
+    id: 'incrop-imazamox-clearfield',
+    category: 'herbicide',
+    weed: 'In-Crop Weed Control (Clearfield Canola)',
+    brands: 'Intervix (Imazamox + Imazapyr)',
+    activeIngredient: 'Imazamox 33g/L + Imazapyr 15g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '750 mL–1 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Clearfield (Imi-tolerant) canola system only — do NOT apply to non-CL varieties. Controls both broadleaf and grass weeds including annual ryegrass. Apply at 2–6 leaf canola stage. Provides both knockdown and residual activity. Observe plant-back periods for following crops.',
+    adjuvantNotes: 'Add Hasten (methylated seed oil) at 0.5% v/v. Hasten is critical for uptake — do not substitute with NIS. Check label for tank-mix restrictions.',
+    season: ['Winter'],
+    labelUrl: apvmaLabel('Intervix'),
+  },
+
+  // ── Pre-Emergent Aerials ──
+  {
+    id: 'preem-trifluralin',
+    category: 'herbicide',
+    weed: 'Pre-Emergent Weed Control (Trifluralin)',
+    brands: 'Treflan 480 (Trifluralin)',
+    activeIngredient: 'Trifluralin 480g/L',
+    droneStatus: 'permitted-helicopter-caution',
+    droneStatusNote: 'Aerial application requires incorporation within 24 hours. Use with caution for drone application — IBS (incorporate by sowing) is standard practice.',
+    aerialRate: '1.5–2 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'IBS (incorporate by sowing) — apply pre-sowing and incorporate within 24 hours by sowing pass. Controls annual ryegrass, wild oats, wireweed, and other small-seeded weeds. Volatile product — apply in cool conditions (early morning or evening). Key pre-emergent in southern cropping systems.',
+    adjuvantNotes: 'No adjuvant required. Apply in cool, calm conditions to minimise volatilisation losses. Do not apply to waterlogged soils.',
+    season: ['Autumn', 'Winter'],
+    labelUrl: apvmaLabel('Treflan'),
+  },
+  {
+    id: 'preem-prosulfocarb',
+    category: 'herbicide',
+    weed: 'Pre-Emergent Weed Control (Prosulfocarb)',
+    brands: 'Arcade (Prosulfocarb)',
+    activeIngredient: 'Prosulfocarb 800g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '2.5–3 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Pre-emergent in wheat and barley. Outstanding annual ryegrass control — key resistance management tool for Group A/B resistant populations. Apply post-sowing pre-emergence. Requires 15mm+ rainfall for activation within 21 days of application.',
+    adjuvantNotes: 'No adjuvant required. Do not apply to crops sown less than 2.5cm deep. Ensure good seed coverage to minimise crop damage.',
+    season: ['Autumn', 'Winter'],
+    states: ['VIC', 'SA', 'WA', 'NSW', 'TAS'],
+    labelUrl: apvmaLabel('Arcade'),
+  },
+  {
+    id: 'preem-pyroxasulfone',
+    category: 'herbicide',
+    weed: 'Pre-Emergent Weed Control (Pyroxasulfone)',
+    brands: 'Sakura 850 WG (Pyroxasulfone)',
+    activeIngredient: 'Pyroxasulfone 850g/kg',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '118 g/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Pre-emergent in wheat, barley, canola, and lupins. Outstanding ryegrass control — premium option for multi-resistant ryegrass populations. Apply post-sowing pre-emergence. Activated by 10–15mm rainfall. Group K herbicide — no cross-resistance to Groups A, B, or D.',
+    adjuvantNotes: 'No adjuvant required. WG formulation — ensure adequate agitation in spray tank. Compatible with most pre-emergent tank-mix partners.',
+    season: ['Autumn', 'Winter'],
+    labelUrl: apvmaLabel('Sakura'),
+  },
+
+  // ── Cotton Herbicides ──
+  {
+    id: 'cotton-glufosinate',
+    category: 'herbicide',
+    weed: 'In-Crop Weed Control (Liberty Link Cotton)',
+    brands: 'Basta (Glufosinate-ammonium)',
+    activeIngredient: 'Glufosinate-ammonium 200g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '3–5 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Over-the-top application in Liberty Link (LibertyLink) cotton ONLY. Non-selective contact herbicide — kills all non-LibertyLink plants on contact. Apply to small weeds (<10cm) for best results. Multiple applications permitted per season — refer to label for maximum number.',
+    adjuvantNotes: 'No additional surfactant required — formulated with surfactant system. Ensure thorough coverage for contact activity. Avoid application in overcast/low-light conditions as glufosinate is light-activated.',
+    season: ['Spring', 'Summer'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Basta'),
+  },
+  {
+    id: 'cotton-glyphosate-rr',
+    category: 'herbicide',
+    weed: 'In-Crop Weed Control (Roundup Ready Cotton)',
+    brands: 'Roundup Ready Herbicide (Glyphosate)',
+    activeIngredient: 'Glyphosate 540g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.5–2.5 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Over-the-top application in Roundup Ready Flex cotton ONLY. Systemic herbicide — controls emerged weeds through translocation. Apply to small, actively growing weeds for best results. Up to 4 in-crop applications permitted per season. Do not apply to non-RR cotton varieties.',
+    adjuvantNotes: 'No additional adjuvant required for 540g/L formulation. Do not add surfactants unless specified on label for particular weed species.',
+    season: ['Spring', 'Summer'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Roundup Ready'),
+  },
+
+  // ── Sugarcane Herbicides ──
+  {
+    id: 'cane-24d-broadleaf',
+    category: 'herbicide',
+    weed: 'In-Crop Broadleaf Control (Sugarcane)',
+    brands: 'Amicide 625 (2,4-D Amine)',
+    activeIngredient: '2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '2–3 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply over-the-top to sugarcane for broadleaf weed control. Controls vine weeds, morning glory, sida, and other tropical broadleaf weeds. Apply when cane is >1m tall and weeds are small and actively growing. Traditional aerial application in QLD sugar industry — drones offer precision advantage.',
+    adjuvantNotes: 'Self-surfactant amine formulation — do not add crop oils. Observe drift management protocols near sensitive crops.',
+    season: ['Spring', 'Summer'],
+    states: ['QLD', 'NSW'],
+    labelUrl: apvmaLabel('2,4-D Amine'),
+  },
+  {
+    id: 'cane-atrazine',
+    category: 'herbicide',
+    weed: 'Pre/Post-Emergent Weed Control (Sugarcane)',
+    brands: 'Gesaprim 600 SC (Atrazine)',
+    activeIngredient: 'Atrazine 600g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '3.3–6.7 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Pre and early post-emergent in sugarcane. Controls grasses and broadleaf weeds. Traditional aerial product in the sugar industry. Note: reef-adjacent areas (GBR catchment) have atrazine use restrictions — check local regulations and Environmental Risk Management Plans.',
+    adjuvantNotes: 'No additional surfactant required for SC formulation. Shake well before use. Do not apply to sandy soils or soils with <1% organic matter.',
+    season: ['Spring', 'Summer'],
+    states: ['QLD', 'NSW'],
+    labelUrl: apvmaLabel('Gesaprim'),
+  },
+
+  // ── Rice Herbicides ──
+  {
+    id: 'rice-mcpa-broadleaf',
+    category: 'herbicide',
+    weed: 'In-Crop Broadleaf Control (Rice)',
+    brands: 'MCPA 750',
+    activeIngredient: 'MCPA 750g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1–2 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Selective broadleaf weed control in rice. Apply at 4–7 leaf rice stage with permanent water established. Controls dirty dora (Cyperus difformis), starfruit, arrowhead, and other aquatic broadleaf weeds. Traditional aerial product in NSW Riverina rice production.',
+    adjuvantNotes: 'Self-surfactant formulation. Maintain permanent water at time of application for best results. Observe buffer zones near waterways.',
+    season: ['Summer'],
+    states: ['NSW'],
+    labelUrl: apvmaLabel('MCPA'),
+  },
+
+  // ── Linseed/Flax Desiccation ──
+  {
+    id: 'desiccation-glyphosate-linseed',
+    category: 'herbicide',
+    weed: 'Pre-Harvest Desiccation (Linseed/Flax)',
+    brands: 'Roundup PowerMAX (Glyphosate)',
+    activeIngredient: 'Glyphosate 540g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '1.5–2 L/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Apply at 75%+ boll maturity when seeds rattle in bolls. Systemic desiccation for even dry-down and harvest facilitation. Observe 7-day withholding period. Do not apply to crop intended for seed production.',
+    adjuvantNotes: 'No additional adjuvant required for 540g/L formulation.',
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Roundup PowerMAX'),
+  },
+
+  // ── Fleabane (Fallow) ──
+  {
+    id: 'fleabane-glyphosate-24d',
+    category: 'herbicide',
+    weed: 'Fleabane (Fallow)',
+    brands: 'Roundup PowerMAX + Amicide 625 (Glyphosate + 2,4-D)',
+    activeIngredient: 'Glyphosate 540g/L + 2,4-D Amine 625g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '2 L/ha glyphosate + 1.5 L/ha 2,4-D',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Tank mix for fleabane in summer fallow. Apply to rosette-stage fleabane BEFORE stem elongation — once elongated, control drops significantly. Double-knock with paraquat 7–10 days later. Fleabane resistance to glyphosate is widespread across NSW/QLD — tank mix with 2,4-D is essential for reliable control.',
+    adjuvantNotes: 'Self-surfactant amine + glyphosate. No additional adjuvant required. Ensure adequate water volume for canopy penetration in dense stubble.',
+    season: ['Summer', 'Autumn'],
+    states: ['NSW', 'QLD', 'VIC', 'SA'],
+    labelUrl: apvmaLabel('Roundup PowerMAX'),
+  },
+  {
+    id: 'fleabane-saflufenacil',
+    category: 'herbicide',
+    weed: 'Fleabane (Fallow)',
+    brands: 'Sharpen (Saflufenacil)',
+    activeIngredient: 'Saflufenacil 700g/kg',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '34 g/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Excellent on glyphosate-resistant fleabane. Apply to rosette stage before stem elongation. Group 14 (PPO inhibitor) burndown — different mode of action to glyphosate. Can tank-mix with glyphosate for broad-spectrum fallow control.',
+    adjuvantNotes: 'Add methylated seed oil (MSO) at 1% v/v (e.g. Hasten, Kwickin). MSO is essential for uptake — do not substitute with NIS. Can add ammonium sulphate for hard water.',
+    season: ['Summer', 'Autumn'],
+    states: ['NSW', 'QLD', 'VIC', 'SA'],
+    labelUrl: apvmaLabel('Sharpen'),
+  },
+
+  // ── Feathertop Rhodes Grass (Fallow) ──
+  {
+    id: 'ftrg-haloxyfop-fallow',
+    category: 'herbicide',
+    weed: 'Feathertop Rhodes Grass (Fallow)',
+    brands: 'Verdict 520 (Haloxyfop)',
+    activeIngredient: 'Haloxyfop 520g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '100–200 mL/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Apply to actively growing feathertop Rhodes grass BEFORE seed-head emergence. Group 1 fop herbicide — systemic, translocated to growing points. Best results on plants <20cm height. Double-knock with paraquat 7–10 days later for complete control. Key northern region summer fallow target.',
+    adjuvantNotes: 'Add crop oil concentrate at 0.5% v/v or as per label. Do not tank-mix with broadleaf herbicides (2,4-D, dicamba) as antagonism will reduce grass control.',
+    season: ['Summer', 'Autumn'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Verdict'),
+  },
+  {
+    id: 'ftrg-clethodim-fallow',
+    category: 'herbicide',
+    weed: 'Feathertop Rhodes Grass (Fallow)',
+    brands: 'Select (Clethodim)',
+    activeIngredient: 'Clethodim 240g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '500 mL/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Group 1 dim herbicide for feathertop Rhodes grass control. Apply to actively growing plants <15cm height for best results. Key rotation partner with haloxyfop to manage Group 1 resistance risk across fop and dim sub-groups.',
+    adjuvantNotes: 'Add Hasten or Supercharge methylated seed oil adjuvant at 1% v/v. Oil adjuvant is essential for uptake. Do not use NIS.',
+    season: ['Summer', 'Autumn'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Select'),
+  },
+
+  // ── Barnyard Grass (Summer Fallow) ──
+  {
+    id: 'barnyard-haloxyfop-fallow',
+    category: 'herbicide',
+    weed: 'Barnyard Grass (Summer Fallow)',
+    brands: 'Verdict 520 (Haloxyfop)',
+    activeIngredient: 'Haloxyfop 520g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial (drones = aircraft per APVMA).',
+    aerialRate: '150–250 mL/ha',
+    waterLHa: '≥50',
+    droneParams: defaultDroneParams,
+    bestTiming: 'Apply to actively tillering barnyard grass before seed-head emergence. Common summer weed in northern NSW/QLD grain belt. Group 1 fop herbicide — systemic control through translocation to meristems.',
+    adjuvantNotes: 'Add crop oil concentrate at 0.5% v/v per label. Do not tank-mix with broadleaf herbicides as antagonism will reduce grass efficacy.',
+    season: ['Summer'],
+    states: ['NSW', 'QLD'],
+    labelUrl: apvmaLabel('Verdict'),
+  },
+
+  // ─── Giant Rat's Tail Grass — additional treatments ─────
+  {
+    id: 'grt-glyphosate-aerial',
+    category: 'herbicide',
+    weed: "Giant rat's tail grass",
+    brands: 'Roundup PowerMAX (Glyphosate)',
+    activeIngredient: 'Glyphosate 540g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial. Non-selective — use in fallow or pasture renovation only. Not for use in established pastures where other species are to be retained.',
+    aerialRate: '3–4 L/ha',
+    waterLHa: '≥80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–400 µm)', flightHeightM: '2–3 m AGL', speedMs: '3–5 m/s' },
+    bestTiming: 'Apply to actively growing GRT grass (Sporobolus pyramidalis / S. natalensis) during warm wet season when plants are 30–60 cm tall with good green leaf area. Spring–summer with adequate soil moisture. Non-selective — kills all contacted vegetation. Best used as part of a pasture renovation program: spray out → cultivate → resow with improved pasture species. Follow-up flupropanate application to manage seedling regrowth. Not suitable for selective control within established pastures.',
+    adjuvantNotes: 'Add non-ionic surfactant at 200 mL/100 L for improved uptake on waxy GRT leaf. Higher water volumes (80–100 L/ha) improve coverage on dense tussocks. Do not apply if rain expected within 6 hours.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Roundup PowerMAX'),
+  },
+  {
+    id: 'grt-graslan-granular',
+    category: 'herbicide',
+    weed: "Giant rat's tail grass",
+    brands: 'Graslan (Tebuthiuron)',
+    activeIngredient: 'Tebuthiuron 200g/kg',
+    droneStatus: 'permitted-granular',
+    droneStatusNote: 'Permitted as granular aerial spread via drone-mounted granule spreader. Slow-release soil-active herbicide — granules dissolve with rainfall over weeks/months.',
+    aerialRate: '5–15 kg/ha granules',
+    waterLHa: 'N/A — dry granular',
+    droneParams: { dropletSize: 'N/A — granular spread', flightHeightM: '3–5 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Apply granules by aerial spread before the wet season so rainfall activates the product. Tebuthiuron is soil-active — absorbed by roots over several months. Slow kill (3–12 months) but long-lasting residual suppression. Best for broad-scale GRT management in extensive pastoral country where selective pasture loss is acceptable. Do not apply near desirable trees — root zone uptake can damage non-target woody vegetation. Monitor for 12 months post-treatment and follow up with flupropanate or cultivation.',
+    adjuvantNotes: 'No adjuvant — dry granular product. Even distribution critical for consistent control — calibrate granule spreader carefully. Avoid waterways and riparian zones. Residual soil activity 1–3 years depending on soil type and rainfall.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring'],
+    labelUrl: apvmaLabel('Graslan'),
+  },
+  {
+    id: 'grt-flupropanate-lowrate',
+    category: 'herbicide',
+    weed: "Giant rat's tail grass",
+    brands: 'Taskforce 745 (Flupropanate) — maintenance rate',
+    activeIngredient: 'Flupropanate 745g/L',
+    droneStatus: 'permitted',
+    droneStatusNote: 'Permitted via aerial application. Lower maintenance rate for follow-up treatment of previously treated areas.',
+    aerialRate: '1 L/ha (maintenance)',
+    waterLHa: '40–80',
+    droneParams: { dropletSize: 'Medium–Coarse (VMD 250–350 µm)', flightHeightM: '2.5–3 m AGL', speedMs: '4–6 m/s' },
+    bestTiming: 'Maintenance rate (1 L/ha) for follow-up treatment 12–18 months after initial 2 L/ha application. Apply during active growth with adequate soil moisture for root uptake. Flupropanate is selective — suppresses GRT and other weedy Sporobolus species while retaining most desirable tropical pasture grasses (Rhodes grass, buffel, green panic are tolerant at this rate). Soil-active via root absorption — rainfall within 2–4 weeks of application needed for activation. Monitor regrowth and re-apply every 2–3 years as part of long-term management program.',
+    adjuvantNotes: 'No surfactant — label prohibits tank mixing with surfactants. Do not apply to waterlogged soils. Keep stock off treated areas for 7 days. Safe for cattle grazing after withholding period. Selective at maintenance rate — check label for tolerant and susceptible grass species list.',
+    states: ['QLD', 'NSW'],
+    season: ['Spring', 'Summer'],
+    labelUrl: apvmaLabel('Taskforce'),
+  },
 ];
 
 export function searchTreatments(query: string): WeedTreatment[] {
-  const q = query.toLowerCase().trim();
+  const q = query.trim();
   if (!q) return [];
   return getAllTreatments().filter((t) =>
     [t.weed, t.brands, t.activeIngredient, t.adjuvantNotes, t.registrant || '', t.apvmaNumber || ''].some((f) =>
-      f.toLowerCase().includes(q)
+      fuzzyMatch(f, q)
     )
   );
 }
@@ -1227,16 +1916,16 @@ export function getTreatmentById(id: string): WeedTreatment | undefined {
 }
 
 export function searchByWeed(query: string): WeedTreatment[] {
-  const q = query.toLowerCase().trim();
+  const q = query.trim();
   if (!q) return [];
-  return getAllTreatments().filter((t) => t.weed.toLowerCase().includes(q));
+  return getAllTreatments().filter((t) => fuzzyMatch(t.weed, q));
 }
 
 export function searchByChemical(query: string): WeedTreatment[] {
-  const q = query.toLowerCase().trim();
+  const q = query.trim();
   if (!q) return [];
   return getAllTreatments().filter((t) =>
-    [t.brands, t.activeIngredient, t.registrant || '', t.apvmaNumber || ''].some((f) => f.toLowerCase().includes(q))
+    [t.brands, t.activeIngredient, t.registrant || '', t.apvmaNumber || ''].some((f) => fuzzyMatch(f, q))
   );
 }
 
@@ -1252,9 +1941,15 @@ export function getAllBrands(): string[] {
   return Array.from(brands).sort();
 }
 
+export function findTreatmentByBrand(brand: string): WeedTreatment | undefined {
+  const b = brand.toLowerCase().trim();
+  if (!b) return undefined;
+  return getAllTreatments().find((t) => t.brands.toLowerCase() === b)
+    || getAllTreatments().find((t) => t.brands.toLowerCase().includes(b));
+}
+
 export function getTreatmentsForWeed(weed: string): WeedTreatment[] {
-  const w = weed.toLowerCase();
-  return getAllTreatments().filter((t) => t.weed.toLowerCase().includes(w));
+  return getAllTreatments().filter((t) => fuzzyMatch(t.weed, weed));
 }
 
 export function getCuratedCount(): number {
@@ -1263,4 +1958,14 @@ export function getCuratedCount(): number {
 
 export function getSavedAPVMACount(): number {
   return getSavedChemicals().length;
+}
+
+export function getTreatmentsByCategory(category: string): WeedTreatment[] {
+  return getAllTreatments().filter((t) => (t.category || 'herbicide') === category);
+}
+
+export function getTargetsByCategory(category: string): string[] {
+  const targets = new Set<string>();
+  getTreatmentsByCategory(category).forEach((t) => { if (t.weed !== '—') targets.add(t.weed); });
+  return Array.from(targets).sort();
 }

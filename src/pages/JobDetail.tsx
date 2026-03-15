@@ -1,0 +1,667 @@
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  Button,
+  TextField,
+  Stack,
+  Alert,
+  MenuItem,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton,
+  Rating,
+  FormControlLabel,
+  Switch,
+  Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  alpha,
+  useTheme,
+} from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ScienceIcon from '@mui/icons-material/Science';
+import AirIcon from '@mui/icons-material/Air';
+import BugReportIcon from '@mui/icons-material/BugReport';
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import PersonIcon from '@mui/icons-material/Person';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import AddIcon from '@mui/icons-material/Add';
+import StarIcon from '@mui/icons-material/Star';
+import DescriptionIcon from '@mui/icons-material/Description';
+import DownloadIcon from '@mui/icons-material/Download';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import {
+  getJobById,
+  getFieldById,
+  getPropertyById,
+  getClientById,
+  deleteJob,
+  getOutcomeByJob,
+  saveOutcome,
+  updateOutcome,
+} from '../services/fieldManagementStore';
+import { JobOutcome, EfficacyRating, PhotoRef } from '../types/fieldManagement';
+import PhotoUpload from '../components/PhotoUpload';
+
+const efficacyLabels: Record<number, string> = {
+  1: 'No effect',
+  2: 'Poor',
+  3: 'Moderate',
+  4: 'Good',
+  5: 'Excellent',
+};
+
+export default function JobDetail() {
+  const { clientId, propertyId, fieldId, jobId } = useParams<{
+    clientId: string; propertyId: string; fieldId: string; jobId: string;
+  }>();
+  const navigate = useNavigate();
+  const theme = useTheme();
+
+  const [job] = useState(() => getJobById(jobId || ''));
+  const field = getFieldById(fieldId || '');
+  const property = getPropertyById(propertyId || '');
+  const client = getClientById(clientId || '');
+
+  const [outcome, setOutcome] = useState(() => getOutcomeByJob(jobId || ''));
+  const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false);
+  const [outcomeForm, setOutcomeForm] = useState({
+    followUpDate: '',
+    efficacyRating: 3 as EfficacyRating,
+    regrowthObserved: false,
+    followUpRequired: false,
+    notes: '',
+    photos: [] as PhotoRef[],
+  });
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+
+  if (!job || !field || !property || !client) {
+    return (
+      <Box>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} sx={{ mb: 2 }}>Back</Button>
+        <Alert severity="error">Job not found.</Alert>
+      </Box>
+    );
+  }
+
+  const basePath = `/jobs/client/${clientId}/property/${propertyId}/field/${fieldId}`;
+
+  const handleDelete = () => {
+    deleteJob(job.id);
+    navigate(basePath);
+  };
+
+  const handleOpenOutcome = () => {
+    if (outcome) {
+      setOutcomeForm({
+        followUpDate: outcome.followUpDate,
+        efficacyRating: outcome.efficacyRating,
+        regrowthObserved: outcome.regrowthObserved,
+        followUpRequired: outcome.followUpRequired,
+        notes: outcome.notes,
+        photos: outcome.photos || [],
+      });
+    } else {
+      setOutcomeForm({
+        followUpDate: '',
+        efficacyRating: 3 as EfficacyRating,
+        regrowthObserved: false,
+        followUpRequired: false,
+        notes: '',
+        photos: [],
+      });
+    }
+    setOutcomeDialogOpen(true);
+  };
+
+  const handleSaveOutcome = () => {
+    const { photos, ...rest } = outcomeForm;
+    if (outcome) {
+      const updated = updateOutcome(outcome.id, { ...rest, photos });
+      setOutcome(updated);
+    } else {
+      const created = saveOutcome({
+        jobId: job.id,
+        ...rest,
+        photos,
+      });
+      setOutcome(created);
+    }
+    setOutcomeDialogOpen(false);
+  };
+
+  const getEfficacyColor = (rating: number) => {
+    if (rating >= 4) return { bg: alpha('#4caf50', 0.1), color: '#2e7d32' };
+    if (rating >= 3) return { bg: alpha('#ff9800', 0.1), color: '#e65100' };
+    return { bg: alpha('#f44336', 0.1), color: '#c62828' };
+  };
+
+  const InfoRow = ({ label, value }: { label: string; value: string | null | undefined }) => {
+    if (!value) return null;
+    return (
+      <Box sx={{ display: 'flex', gap: 2, py: 0.75 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ minWidth: 130, fontWeight: 600 }}>{label}</Typography>
+        <Typography variant="body2">{value}</Typography>
+      </Box>
+    );
+  };
+
+  return (
+    <Box>
+      <Button
+        startIcon={<ArrowBackIcon />}
+        onClick={() => navigate(basePath)}
+        sx={{ mb: 3, color: 'text.secondary', fontWeight: 600, '&:hover': { color: 'primary.main' } }}
+      >
+        {field.name}
+      </Button>
+
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }} className="ftf-animate-in">
+        <Box>
+          <Typography variant="h4" sx={{ fontWeight: 800, color: 'primary.dark', fontSize: { xs: '1.4rem', md: '1.75rem' } }}>
+            Spray Job — {new Date(job.dateSprayed).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {client.name} &bull; {property.name} &bull; {field.name}
+          </Typography>
+        </Box>
+        <Stack direction="row" spacing={0.5}>
+          <IconButton size="small" onClick={() => setDeleteConfirm(true)} sx={{ color: 'error.main' }}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Stack>
+      </Box>
+
+      <Stack spacing={3} className="ftf-animate-in-delay-1">
+        {/* Weed & Chemicals */}
+        <Card elevation={0} sx={{ border: `1.5px solid ${alpha(theme.palette.primary.main, 0.1)}`, borderRadius: '16px' }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <ScienceIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+              <Typography variant="subtitle1" fontWeight={700} color="primary.dark">Weed & Chemicals</Typography>
+            </Box>
+            <InfoRow label="Weed Target" value={job.weedTarget} />
+
+            {job.chemicals && job.chemicals.length > 0 ? (
+              <Box sx={{ mt: 1.5 }}>
+                <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ mb: 1 }}>
+                  Chemicals ({job.chemicals.length})
+                </Typography>
+                <Stack spacing={1.5}>
+                  {job.chemicals.map((chem, idx) => (
+                    <Box key={idx} sx={{
+                      p: 1.5, borderRadius: '10px',
+                      bgcolor: alpha(theme.palette.primary.main, 0.03),
+                      border: `1px solid ${alpha(theme.palette.primary.main, 0.06)}`,
+                    }}>
+                      <Typography variant="body2" fontWeight={700}>{chem.product}</Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                        {chem.activeIngredient}
+                      </Typography>
+                      {chem.ratePerHa && (
+                        <Typography variant="caption" color="text.secondary">
+                          Rate: {chem.ratePerHa}
+                        </Typography>
+                      )}
+                    </Box>
+                  ))}
+                </Stack>
+              </Box>
+            ) : (
+              <>
+                <InfoRow label="Chemical" value={job.chemicalUsed} />
+                <InfoRow label="Active Ingredient" value={job.activeIngredient} />
+                <InfoRow label="Spray Rate" value={job.sprayRateLHa ? `${job.sprayRateLHa} L/ha` : null} />
+              </>
+            )}
+
+            <Box sx={{ mt: 1.5 }}>
+              <InfoRow label="Water Rate" value={job.waterRateLHa ? `${job.waterRateLHa} L/ha` : null} />
+              <InfoRow label="Adjuvants" value={job.adjuvants} />
+            </Box>
+          </CardContent>
+        </Card>
+
+        {/* Batch Info */}
+        {job.batchInfo && (
+          <Card elevation={0} sx={{
+            border: `1.5px solid ${alpha('#1976d2', 0.15)}`,
+            borderRadius: '16px',
+            bgcolor: alpha('#1976d2', 0.02),
+          }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <LocalShippingIcon sx={{ color: '#1976d2', fontSize: 20 }} />
+                <Typography variant="subtitle1" fontWeight={700} sx={{ color: '#1976d2' }}>Batch Mix</Typography>
+              </Box>
+
+              <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+                {[
+                  { label: 'Hectares', value: `${job.batchInfo.hectares} ha` },
+                  { label: 'App Rate', value: `${job.batchInfo.applicationRateLHa} L/ha` },
+                  { label: 'Tank Size', value: `${job.batchInfo.tankSizeL} L` },
+                  { label: 'Total Volume', value: `${job.batchInfo.totalSprayVolumeL} L` },
+                  { label: 'Batches', value: String(job.batchInfo.totalBatches) },
+                  { label: 'Ha / Batch', value: `${Number(job.batchInfo.hectaresPerBatch.toFixed(2))} ha` },
+                ].map((s) => (
+                  <Box key={s.label}>
+                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#1976d2', fontFamily: '"Outfit", system-ui', lineHeight: 1 }}>
+                      {s.value}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">{s.label}</Typography>
+                  </Box>
+                ))}
+              </Stack>
+
+              <TableContainer sx={{ borderRadius: '10px', border: `1px solid ${alpha('#1976d2', 0.1)}` }}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow sx={{ '& th': { fontWeight: 700, fontSize: '0.7rem', color: 'text.secondary' } }}>
+                      <TableCell>Product</TableCell>
+                      <TableCell align="right">Rate / ha</TableCell>
+                      <TableCell align="right">Per Batch</TableCell>
+                      <TableCell align="right">Total Job</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {job.batchInfo.chemicalBreakdown.map((c, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell><Typography variant="body2" fontWeight={600}>{c.name}</Typography></TableCell>
+                        <TableCell align="right"><Typography variant="body2">{c.ratePerHa} {c.unit}/ha</Typography></TableCell>
+                        <TableCell align="right"><Typography variant="body2" fontWeight={700} sx={{ color: '#1976d2' }}>{Number(c.perBatch.toFixed(2))} {c.unit}</Typography></TableCell>
+                        <TableCell align="right"><Typography variant="body2" fontWeight={700} sx={{ color: '#1b8a5a' }}>{Number(c.totalJob.toFixed(2))} {c.unit}</Typography></TableCell>
+                      </TableRow>
+                    ))}
+                    <TableRow sx={{ bgcolor: alpha('#1976d2', 0.04) }}>
+                      <TableCell><Typography variant="body2" fontWeight={700} sx={{ color: '#1976d2' }}>Water</Typography></TableCell>
+                      <TableCell />
+                      <TableCell align="right"><Typography variant="body2" fontWeight={700} sx={{ color: '#1976d2' }}>{Number(job.batchInfo.waterPerBatchL.toFixed(1))} L</Typography></TableCell>
+                      <TableCell align="right"><Typography variant="body2" fontWeight={700} sx={{ color: '#1976d2' }}>{Number((job.batchInfo.waterPerBatchL * job.batchInfo.totalBatches).toFixed(0))} L</Typography></TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Date & Weather */}
+        <Card elevation={0} sx={{ border: `1.5px solid ${alpha(theme.palette.primary.main, 0.1)}`, borderRadius: '16px' }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+              <AirIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+              <Typography variant="subtitle1" fontWeight={700} color="primary.dark">Date & Weather</Typography>
+            </Box>
+            <InfoRow label="Date Sprayed" value={new Date(job.dateSprayed).toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })} />
+
+            {/* Recorded Spray Conditions (2-hourly) */}
+            {job.sprayConditions && job.sprayConditions.length > 0 ? (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                  Recorded Spray Conditions ({job.sprayConditions.length} recording{job.sprayConditions.length !== 1 ? 's' : ''})
+                </Typography>
+                <TableContainer sx={{
+                  borderRadius: '12px',
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+                  maxHeight: 300,
+                }}>
+                  <Table size="small" stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>Time</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Temp</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Humidity</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Dewpoint</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Delta T</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Wind</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Gusts</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>Dir</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {job.sprayConditions.map((entry) => {
+                        const hour = new Date(entry.time).getHours();
+                        const min = new Date(entry.time).getMinutes();
+                        const timeStr = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+                        return (
+                          <TableRow key={entry.time}>
+                            <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{timeStr}</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.tempC}°C</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.humidity}%</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.dewpointC}°C</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.deltaT}</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.windSpeedKmh}</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.windGustsKmh}</TableCell>
+                            <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{entry.windDirection}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Box>
+            ) : (
+              /* Fallback: show single weather snapshot for older jobs */
+              <Box sx={{ mt: 1.5 }}>
+                <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mb: 0.5 }}>Spray Conditions</Typography>
+                <InfoRow label="Temperature" value={job.weather.tempC != null ? `${job.weather.tempC}°C` : null} />
+                <InfoRow label="Humidity" value={job.weather.humidity != null ? `${job.weather.humidity}%` : null} />
+                <InfoRow label="Delta T" value={job.weather.deltaT != null ? String(job.weather.deltaT) : null} />
+                <InfoRow label="Wind Speed" value={job.weather.windSpeedKmh != null ? `${job.weather.windSpeedKmh} km/h` : null} />
+                <InfoRow label="Wind Direction" value={job.weather.windDirection || null} />
+              </Box>
+            )}
+
+            {/* Reference weather log from API */}
+            {job.weatherLog && job.weatherLog.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                  2-Hourly Weather Reference
+                </Typography>
+                <TableContainer sx={{
+                  borderRadius: '12px',
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+                  maxHeight: 280,
+                }}>
+                  <Table size="small" stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>Time</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Temp</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Humidity</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Delta T</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Wind</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }} align="right">Gusts</TableCell>
+                        <TableCell sx={{ fontWeight: 700, fontSize: '0.7rem' }}>Dir</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {job.weatherLog.map((entry) => {
+                        const hour = new Date(entry.time).getHours();
+                        return (
+                          <TableRow key={entry.time}>
+                            <TableCell sx={{ fontSize: '0.8rem' }}>{String(hour).padStart(2, '0')}:00</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.tempC}°C</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.humidity}%</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.deltaT}</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.windSpeedKmh}</TableCell>
+                            <TableCell align="right" sx={{ fontSize: '0.8rem' }}>{entry.windGustsKmh}</TableCell>
+                            <TableCell sx={{ fontSize: '0.8rem', fontWeight: 600 }}>{entry.windDirection}</TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mt: 0.5 }}>
+                  Weather data by Open-Meteo.com
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Operator */}
+        {(job.droneModel || job.applicatorName || job.notes) && (
+          <Card elevation={0} sx={{ border: `1.5px solid ${alpha(theme.palette.primary.main, 0.1)}`, borderRadius: '16px' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="subtitle1" fontWeight={700} color="primary.dark" sx={{ mb: 2 }}>Operator Details</Typography>
+              <InfoRow label="Drone Model" value={job.droneModel} />
+              <InfoRow label="Applicator" value={job.applicatorName} />
+              <InfoRow label="Notes" value={job.notes} />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Spray Recommendation */}
+        {job.sprayRec && (
+          <Card elevation={0} sx={{ border: `1.5px solid ${alpha(theme.palette.primary.main, 0.1)}`, borderRadius: '16px' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <DescriptionIcon sx={{ color: 'primary.main', fontSize: 20 }} />
+                <Typography variant="subtitle1" fontWeight={700} color="primary.dark">Spray Recommendation</Typography>
+              </Box>
+              <Box sx={{
+                p: 2, borderRadius: '12px',
+                bgcolor: alpha(theme.palette.primary.main, 0.03),
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                flexWrap: 'wrap', gap: 1.5,
+              }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                  <DescriptionIcon sx={{ color: 'primary.main' }} />
+                  <Box>
+                    <Typography variant="body2" fontWeight={700}>{job.sprayRec.fileName}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {job.sprayRec.sizeBytes < 1048576
+                        ? `${(job.sprayRec.sizeBytes / 1024).toFixed(1)} KB`
+                        : `${(job.sprayRec.sizeBytes / 1048576).toFixed(1)} MB`
+                      } &bull; Uploaded {new Date(job.sprayRec.uploadedAt).toLocaleDateString('en-AU')}
+                    </Typography>
+                  </Box>
+                </Box>
+                <Button
+                  size="small"
+                  startIcon={<DownloadIcon />}
+                  onClick={() => {
+                    const a = document.createElement('a');
+                    a.href = job.sprayRec!.dataUrl;
+                    a.download = job.sprayRec!.fileName;
+                    a.click();
+                  }}
+                  sx={{ borderRadius: '8px', fontWeight: 600 }}
+                >
+                  Download
+                </Button>
+              </Box>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Outcome */}
+        <Card elevation={0} sx={{
+          border: `1.5px solid ${outcome ? alpha('#4caf50', 0.2) : alpha(theme.palette.primary.main, 0.1)}`,
+          borderRadius: '16px',
+        }}>
+          <CardContent sx={{ p: 3 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <CheckCircleIcon sx={{ color: outcome ? '#4caf50' : 'text.disabled', fontSize: 20 }} />
+                <Typography variant="subtitle1" fontWeight={700} color="primary.dark">Job Outcome</Typography>
+              </Box>
+              <Button
+                size="small"
+                startIcon={outcome ? <EditIcon /> : <AddIcon />}
+                onClick={handleOpenOutcome}
+                sx={{ borderRadius: '10px', fontWeight: 700 }}
+              >
+                {outcome ? 'Edit Outcome' : 'Record Outcome'}
+              </Button>
+            </Box>
+
+            {outcome ? (
+              <Box>
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1.5 }}>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.25 }}>Efficacy</Typography>
+                    <Chip
+                      icon={<StarIcon sx={{ fontSize: 14 }} />}
+                      label={`${outcome.efficacyRating}/5 — ${efficacyLabels[outcome.efficacyRating]}`}
+                      sx={{
+                        fontWeight: 700,
+                        bgcolor: getEfficacyColor(outcome.efficacyRating).bg,
+                        color: getEfficacyColor(outcome.efficacyRating).color,
+                      }}
+                    />
+                  </Box>
+                  {outcome.regrowthObserved && (
+                    <Chip label="Regrowth observed" size="small" color="warning" variant="outlined" />
+                  )}
+                  {outcome.followUpRequired && (
+                    <Chip label="Follow-up required" size="small" color="error" variant="outlined" />
+                  )}
+                </Stack>
+                <InfoRow label="Follow-up Date" value={outcome.followUpDate ? new Date(outcome.followUpDate).toLocaleDateString('en-AU') : null} />
+                <InfoRow label="Notes" value={outcome.notes} />
+
+                {outcome.photos && outcome.photos.length > 0 && (
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="body2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                      Photos ({outcome.photos.length})
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+                      {outcome.photos.map((photo, idx) => (
+                        <Box key={idx} sx={{ position: 'relative' }}>
+                          <Box
+                            component="img"
+                            src={photo.dataUrl}
+                            alt={photo.caption || photo.fileName}
+                            sx={{
+                              width: 120, height: 120, borderRadius: '10px',
+                              objectFit: 'cover', cursor: 'pointer',
+                              border: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                            }}
+                            onClick={() => window.open(photo.dataUrl, '_blank')}
+                          />
+                          <Chip
+                            label={photo.type}
+                            size="small"
+                            sx={{
+                              position: 'absolute', top: 4, left: 4,
+                              fontSize: '0.6rem', fontWeight: 700, height: 18,
+                              bgcolor: photo.type === 'before' ? alpha('#ff9800', 0.9) : alpha('#4caf50', 0.9),
+                              color: 'white',
+                            }}
+                          />
+                          {photo.caption && (
+                            <Typography variant="caption" color="text.secondary" sx={{
+                              display: 'block', mt: 0.25, maxWidth: 120,
+                              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                            }}>
+                              {photo.caption}
+                            </Typography>
+                          )}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No outcome recorded yet. Record the result after the withholding period.
+              </Typography>
+            )}
+          </CardContent>
+        </Card>
+      </Stack>
+
+      {/* Outcome Dialog */}
+      <Dialog open={outcomeDialogOpen} onClose={() => setOutcomeDialogOpen(false)} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
+        <DialogTitle sx={{ fontWeight: 700 }}>{outcome ? 'Edit Outcome' : 'Record Outcome'}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2.5} sx={{ mt: 1 }}>
+            <Box>
+              <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Efficacy Rating</Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Rating
+                  value={outcomeForm.efficacyRating}
+                  onChange={(_e, value) => {
+                    if (value) setOutcomeForm({ ...outcomeForm, efficacyRating: value as EfficacyRating });
+                  }}
+                  max={5}
+                  size="large"
+                />
+                <Typography variant="body2" color="text.secondary">
+                  {efficacyLabels[outcomeForm.efficacyRating]}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Divider />
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={outcomeForm.regrowthObserved}
+                  onChange={(e) => setOutcomeForm({ ...outcomeForm, regrowthObserved: e.target.checked })}
+                />
+              }
+              label="Regrowth observed"
+            />
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={outcomeForm.followUpRequired}
+                  onChange={(e) => setOutcomeForm({ ...outcomeForm, followUpRequired: e.target.checked })}
+                />
+              }
+              label="Follow-up spray required"
+            />
+
+            <TextField
+              label="Follow-up Date"
+              type="date"
+              value={outcomeForm.followUpDate}
+              onChange={(e) => setOutcomeForm({ ...outcomeForm, followUpDate: e.target.value })}
+              fullWidth
+              slotProps={{ inputLabel: { shrink: true } }}
+            />
+
+            <TextField
+              label="Notes"
+              value={outcomeForm.notes}
+              onChange={(e) => setOutcomeForm({ ...outcomeForm, notes: e.target.value })}
+              multiline
+              rows={3}
+              fullWidth
+              placeholder="How did the treatment perform? Any observations..."
+            />
+
+            <Divider />
+
+            <PhotoUpload
+              photos={outcomeForm.photos}
+              onChange={(photos) => setOutcomeForm({ ...outcomeForm, photos })}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setOutcomeDialogOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleSaveOutcome} sx={{ borderRadius: '10px', fontWeight: 700 }}>
+            {outcome ? 'Update Outcome' : 'Save Outcome'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirm */}
+      <Dialog open={deleteConfirm} onClose={() => setDeleteConfirm(false)} PaperProps={{ sx: { borderRadius: '16px' } }}>
+        <DialogTitle sx={{ fontWeight: 700 }}>Delete Job?</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">
+            This will permanently delete this spray job record and any associated outcome data.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setDeleteConfirm(false)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleDelete} sx={{ borderRadius: '10px', fontWeight: 700 }}>Delete</Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+}

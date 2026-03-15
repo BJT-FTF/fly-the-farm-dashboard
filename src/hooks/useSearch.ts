@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { WeedTreatment, APVMAProduct } from '../types/chemical';
-import { searchByWeed, searchByChemical, searchTreatments } from '../data/chemicals';
+import { searchByWeed, searchByChemical, searchTreatments, getTreatmentsByCategory } from '../data/chemicals';
 import { searchAPVMAProducts } from '../services/apvmaService';
 import { saveAPVMAProducts } from '../services/savedChemicals';
 
@@ -11,7 +11,7 @@ interface SearchState {
   apvmaError: string | null;
 }
 
-export function useSearch(query: string, mode: 'chemical' | 'weed'): SearchState {
+export function useSearch(query: string, mode: 'chemical' | 'weed', browseAll?: boolean): SearchState {
   const [apvmaResults, setApvmaResults] = useState<APVMAProduct[]>([]);
   const [apvmaLoading, setApvmaLoading] = useState(false);
   const [apvmaError, setApvmaError] = useState<string | null>(null);
@@ -20,7 +20,13 @@ export function useSearch(query: string, mode: 'chemical' | 'weed'): SearchState
 
   // Local search is synchronous — includes saved APVMA entries
   let localResults: WeedTreatment[];
-  if (!query) {
+  if (!query && browseAll) {
+    // Browse mode — return all treatments (filtered by category/status in SearchResults)
+    localResults = getTreatmentsByCategory('herbicide')
+      .concat(getTreatmentsByCategory('insecticide'))
+      .concat(getTreatmentsByCategory('fungicide'))
+      .concat(getTreatmentsByCategory('pesticide'));
+  } else if (!query) {
     localResults = [];
   } else if (mode === 'weed') {
     localResults = searchByWeed(query);

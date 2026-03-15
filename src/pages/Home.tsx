@@ -13,6 +13,8 @@ import {
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import GrassIcon from '@mui/icons-material/Grass';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
@@ -36,6 +38,22 @@ export default function Home() {
       color: theme.palette.secondary.main,
       path: '/calculator',
       ready: false,
+    },
+    {
+      title: 'Job Management',
+      description: 'Manage clients, properties, fields, and spray job records with outcome tracking.',
+      icon: <AssignmentIcon />,
+      color: '#5b7a3a',
+      path: '/jobs',
+      ready: true,
+    },
+    {
+      title: 'Quote Builder',
+      description: 'Build accurate quotes for your drone spray services with per-hectare, hourly, or daily pricing.',
+      icon: <ReceiptLongIcon />,
+      color: '#6a4c93',
+      path: '/quotes',
+      ready: true,
     },
   ];
 
@@ -83,10 +101,10 @@ export default function Home() {
       </Box>
 
       {/* Tool cards */}
-      <Box className="ftf-animate-in-delay-1" sx={{ maxWidth: 700, mx: 'auto' }}>
+      <Box className="ftf-animate-in-delay-1" sx={{ maxWidth: 1000, mx: 'auto' }}>
         <Grid container spacing={3}>
           {tools.map((tool) => (
-            <Grid size={{ xs: 12, sm: 6 }} key={tool.title}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={tool.title}>
               <Card
                 elevation={0}
                 sx={{

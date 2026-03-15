@@ -22,21 +22,36 @@ import WeedRecommendations from '../components/WeedRecommendations';
 import TankMixRecommendations from '../components/TankMixRecommendations';
 import { useSearch } from '../hooks/useSearch';
 import { getSeasonsForTreatment, getStatesForTreatment } from '../data/chemicals';
-import { AustralianState, Season, ALL_STATES, ALL_SEASONS } from '../types/chemical';
+import { AustralianState, Season, ALL_STATES, ALL_SEASONS, ChemicalCategory } from '../types/chemical';
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const mode = (searchParams.get('mode') || 'chemical') as 'chemical' | 'weed';
+  const categoryParam = searchParams.get('category') as ChemicalCategory | null;
+  const statusParam = searchParams.get('status') || '';
   const theme = useTheme();
 
   const [stateFilter, setStateFilter] = useState<AustralianState | null>(null);
   const [seasonFilter, setSeasonFilter] = useState<Season | null>(null);
 
-  const { localResults, apvmaResults, apvmaLoading, apvmaError } = useSearch(query, mode);
+  const browseAll = !query && !!(statusParam || categoryParam);
+  const { localResults, apvmaResults, apvmaLoading, apvmaError } = useSearch(query, mode, browseAll);
 
   const filteredResults = useMemo(() => {
     let results = localResults;
+    // Category filter from URL param
+    if (categoryParam) {
+      results = results.filter((t) => (t.category || 'herbicide') === categoryParam);
+    }
+    // Status filter from URL param (used by Dashboard "Browse by Drone Status" cards)
+    if (statusParam === 'permitted') {
+      results = results.filter((t) => t.droneStatus === 'permitted' || t.droneStatus === 'permitted-granular');
+    } else if (statusParam === 'caution') {
+      results = results.filter((t) => t.droneStatus === 'permitted-helicopter-caution' || t.droneStatus === 'permitted-fallow-only');
+    } else if (statusParam === 'not-permitted') {
+      results = results.filter((t) => t.droneStatus.startsWith('not-'));
+    }
     if (stateFilter) {
       results = results.filter((t) => getStatesForTreatment(t).includes(stateFilter));
     }
@@ -44,7 +59,7 @@ export default function SearchResults() {
       results = results.filter((t) => getSeasonsForTreatment(t).includes(seasonFilter));
     }
     return results;
-  }, [localResults, stateFilter, seasonFilter]);
+  }, [localResults, stateFilter, seasonFilter, categoryParam, statusParam]);
 
   return (
     <Box>

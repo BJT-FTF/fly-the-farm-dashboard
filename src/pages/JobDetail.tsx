@@ -44,6 +44,7 @@ import StarIcon from '@mui/icons-material/Star';
 import DescriptionIcon from '@mui/icons-material/Description';
 import DownloadIcon from '@mui/icons-material/Download';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import {
   getJobById,
   getFieldById,
@@ -181,11 +182,42 @@ export default function JobDetail() {
           </Typography>
         </Box>
         <Stack direction="row" spacing={0.5}>
+          <IconButton
+            size="small"
+            onClick={() => {
+              const prefill = {
+                fromJobId: job.id,
+                clientId: job.clientId,
+                propertyId: job.propertyId,
+                fieldIds: [job.fieldId],
+                jobDescription: `Spray job: ${job.weedTarget} — ${job.chemicals.map(c => c.product).join(', ')}`,
+                chemicals: job.chemicals,
+                droneModel: job.droneModel,
+              };
+              sessionStorage.setItem('ftf_quote_prefill', JSON.stringify(prefill));
+              navigate('/quotes/new');
+            }}
+            sx={{ color: '#6a4c93' }}
+            title="Create Quote"
+          >
+            <ReceiptLongIcon fontSize="small" />
+          </IconButton>
           <IconButton size="small" onClick={() => setDeleteConfirm(true)} sx={{ color: 'error.main' }}>
             <DeleteIcon fontSize="small" />
           </IconButton>
         </Stack>
       </Box>
+
+      {job.quoteId && (
+        <Chip
+          label="Linked Quote"
+          size="small"
+          onClick={() => navigate(`/quotes/${job.quoteId}`)}
+          sx={{ cursor: 'pointer', fontWeight: 700, mb: 2 }}
+          color="secondary"
+          variant="outlined"
+        />
+      )}
 
       <Stack spacing={3} className="ftf-animate-in-delay-1">
         {/* Weed & Chemicals */}

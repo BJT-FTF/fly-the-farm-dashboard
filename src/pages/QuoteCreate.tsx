@@ -62,7 +62,7 @@ import {
   getKitById,
 } from '../services/quoteStore';
 import { PricingMode, QuoteLineItem, QuoteConfig, Kit } from '../types/quote';
-import { calculateTotals, computePerHaRate, calculateJobCosts, calculateMargin, formatCurrency } from '../utils/quoteCalculator';
+import { calculateTotals, computePerHaRate, calculateJobCosts, calculateMultiKitJobCosts, calculateMargin, formatCurrency } from '../utils/quoteCalculator';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import WarningIcon from '@mui/icons-material/Warning';
@@ -276,11 +276,28 @@ export default function QuoteCreate() {
   // Kit & Cost tracking
   const allKits = useMemo(() => getKits(userId), [userId]);
   const defaultKit = useMemo(() => getDefaultKit(userId), [userId]);
-  const [selectedKitId, setSelectedKitId] = useState<string | null>(defaultKit?.id || null);
-  const selectedKit = useMemo(
-    () => (selectedKitId ? allKits.find((k) => k.id === selectedKitId) || null : null),
-    [selectedKitId, allKits],
+  const [kitSelections, setKitSelections] = useState<{ kitId: string; quantity: number }[]>(
+    defaultKit ? [{ kitId: defaultKit.id, quantity: 1 }] : []
   );
+  const resolvedKits = useMemo(() => {
+    return kitSelections
+      .map(sel => {
+        const kit = allKits.find(k => k.id === sel.kitId);
+        return kit ? { kit, quantity: sel.quantity } : null;
+      })
+      .filter(Boolean) as { kit: Kit; quantity: number }[];
+  }, [kitSelections, allKits]);
+  const primaryKit = resolvedKits[0]?.kit || null;
+
+  const totalDroneCount = kitSelections.reduce((sum, s) => sum + s.quantity, 0);
+  const [pilotCountStr, setPilotCountStr] = useState('1');
+  const pilotCount = parseInt(pilotCountStr) || 1;
+  const [pilotRateStr, setPilotRateStr] = useState(String(defaultKit?.pilotCostPerHour || 60));
+  const pilotRate = parseFloat(pilotRateStr) || 0;
+  const [hasChemOp, setHasChemOp] = useState(false);
+  const [chemOpRateStr, setChemOpRateStr] = useState(String(config.defaultChemOperatorRatePerHour || 45));
+  const chemOpRate = parseFloat(chemOpRateStr) || 0;
+
   const [estFlightHoursStr, setEstFlightHoursStr] = useState('');
   const estFlightHours = parseFloat(estFlightHoursStr) || 0;
   const [setupTravelHoursStr, setSetupTravelHoursStr] = useState('1');
@@ -525,16 +542,18 @@ export default function QuoteCreate() {
   }, [chemSupply, chemLines]);
 
   const costBreakdown = useMemo(() => {
-    if (!selectedKit || estFlightHours <= 0) return null;
-    return calculateJobCosts(
-      selectedKit,
+    if (resolvedKits.length === 0 || estFlightHours <= 0) return null;
+    return calculateMultiKitJobCosts(
+      resolvedKits,
+      { pilotCount, pilotRate, hasChemOp, chemOpRate },
       estFlightHours,
       setupTravelHours,
       travelKm,
       operatorChemCost,
       totals.subtotalAfterMarkup,
     );
-  }, [selectedKit, estFlightHours, setupTravelHours, travelKm, operatorChemCost, totals.subtotalAfterMarkup]);
+  }, [resolvedKits, pilotCount, pilotRate, hasChemOp, chemOpRate,
+      estFlightHours, setupTravelHours, travelKm, operatorChemCost, totals.subtotalAfterMarkup]);
 
   const margin = useMemo(() => {
     if (!costBreakdown) return null;
@@ -573,7 +592,14 @@ export default function QuoteCreate() {
       ...totals,
       paymentTermsDays,
       termsAndConditions: config.termsAndConditions,
-      kitId: selectedKitId || undefined,
+      kitId: kitSelections[0]?.kitId || undefined,
+      kitSelections: kitSelections.length > 0 ? kitSelections : undefined,
+      crew: {
+        pilotCount,
+        pilotRatePerHour: pilotRate,
+        hasChemOperator: hasChemOp,
+        chemOperatorRatePerHour: chemOpRate,
+      },
       costBreakdown: costBreakdown || undefined,
       margin: margin || undefined,
       notes: internalNotes,
@@ -1329,35 +1355,102 @@ export default function QuoteCreate() {
             ) : (
               <Stack spacing={2.5}>
                 {/* Kit selector */}
+                <Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>Equipment</Typography>
+                {kitSelections.map((sel, idx) => {
+                  const kit = allKits.find(k => k.id === sel.kitId);
+                  return (
+                    <Stack key={idx} direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+                      <TextField
+                        select
+                        size="small"
+                        value={sel.kitId}
+                        onChange={(e) => {
+                          const updated = [...kitSelections];
+                          updated[idx] = { ...sel, kitId: e.target.value };
+                          setKitSelections(updated);
+                        }}
+                        sx={{ flex: 1 }}
+                        label="Kit"
+                      >
+                        {allKits.map((k) => (
+                          <MenuItem key={k.id} value={k.id}>{k.name} ({k.droneModel})</MenuItem>
+                        ))}
+                      </TextField>
+                      <TextField
+                        label="Qty"
+                        type="number"
+                        size="small"
+                        value={sel.quantity}
+                        onChange={(e) => {
+                          const updated = [...kitSelections];
+                          updated[idx] = { ...sel, quantity: Math.max(1, parseInt(e.target.value) || 1) };
+                          setKitSelections(updated);
+                        }}
+                        sx={{ width: 75 }}
+                        inputProps={{ min: 1, max: 10 }}
+                      />
+                      {kitSelections.length > 1 && (
+                        <IconButton size="small" onClick={() => setKitSelections(kitSelections.filter((_, i) => i !== idx))}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Stack>
+                  );
+                })}
+                <Button
+                  size="small"
+                  startIcon={<AddIcon />}
+                  onClick={() => {
+                    if (allKits.length > 0) {
+                      setKitSelections([...kitSelections, { kitId: allKits[0].id, quantity: 1 }]);
+                    }
+                  }}
+                  sx={{ mb: 1.5 }}
+                >
+                  Add Kit
+                </Button>
+                {totalDroneCount > 1 && (
+                  <Chip label={`${totalDroneCount} drones total`} size="small" color="primary" variant="outlined" sx={{ mb: 1 }} />
+                )}
+
+                <Divider sx={{ my: 1.5 }} />
+                <Typography variant="body2" fontWeight={700} sx={{ mb: 1 }}>Crew</Typography>
                 <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
-                  <PrecisionManufacturingIcon color="action" />
                   <TextField
-                    select
-                    label="Equipment Kit"
-                    value={selectedKitId || ''}
-                    onChange={(e) => setSelectedKitId(e.target.value || null)}
+                    label="Pilots"
+                    type="number"
                     size="small"
-                    sx={{ minWidth: 250 }}
-                  >
-                    <MenuItem value="">
-                      <em>No kit (skip cost tracking)</em>
-                    </MenuItem>
-                    {allKits.map((k) => (
-                      <MenuItem key={k.id} value={k.id}>
-                        {k.name}{k.isDefault ? ' (default)' : ''}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                  {selectedKit && (
-                    <Chip
-                      label={`${selectedKit.droneModel} | ${selectedKit.batteryCount} batteries | ${selectedKit.tankSizeLitres}L`}
+                    value={pilotCountStr}
+                    onChange={(e) => setPilotCountStr(e.target.value)}
+                    sx={{ width: 80 }}
+                    inputProps={{ min: 1, max: 10 }}
+                    helperText={totalDroneCount > 1 && pilotCount < totalDroneCount ? 'Swarming' : ''}
+                  />
+                  <TextField
+                    label="Pilot $/hr"
+                    type="number"
+                    size="small"
+                    value={pilotRateStr}
+                    onChange={(e) => setPilotRateStr(e.target.value)}
+                    sx={{ width: 120 }}
+                  />
+                  <FormControlLabel
+                    control={<Switch checked={hasChemOp} onChange={(e) => setHasChemOp(e.target.checked)} size="small" />}
+                    label={<Typography variant="body2">Chem Operator</Typography>}
+                  />
+                  {hasChemOp && (
+                    <TextField
+                      label="Chem Op $/hr"
+                      type="number"
                       size="small"
-                      variant="outlined"
+                      value={chemOpRateStr}
+                      onChange={(e) => setChemOpRateStr(e.target.value)}
+                      sx={{ width: 120 }}
                     />
                   )}
                 </Stack>
 
-                {selectedKit && (
+                {resolvedKits.length > 0 && (
                   <>
                     {/* Job time estimates */}
                     <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
@@ -1369,8 +1462,8 @@ export default function QuoteCreate() {
                         size="small"
                         sx={{ width: 150 }}
                         helperText={
-                          hectares > 0 && selectedKit.hectaresPerFlightHour > 0
-                            ? `~${(hectares / selectedKit.hectaresPerFlightHour).toFixed(1)} hrs for ${hectares} ha`
+                          hectares > 0 && primaryKit?.hectaresPerFlightHour && primaryKit.hectaresPerFlightHour > 0
+                            ? `~${(hectares / primaryKit.hectaresPerFlightHour).toFixed(1)} hrs for ${hectares} ha`
                             : undefined
                         }
                       />
@@ -1383,12 +1476,12 @@ export default function QuoteCreate() {
                         sx={{ width: 150 }}
                         helperText="Non-flight work time"
                       />
-                      {hectares > 0 && selectedKit.hectaresPerFlightHour > 0 && !estFlightHoursStr && (
+                      {hectares > 0 && primaryKit?.hectaresPerFlightHour && primaryKit.hectaresPerFlightHour > 0 && !estFlightHoursStr && (
                         <Button
                           size="small"
                           variant="outlined"
                           onClick={() => setEstFlightHoursStr(
-                            String(Math.round(hectares / selectedKit.hectaresPerFlightHour * 10) / 10)
+                            String(Math.round(hectares / primaryKit!.hectaresPerFlightHour * 10) / 10)
                           )}
                         >
                           Auto-estimate from hectares
@@ -1414,7 +1507,10 @@ export default function QuoteCreate() {
                                     <TableCell align="right" sx={{ py: 0.3, fontSize: '0.8rem' }}>{formatCurrency(costBreakdown.equipmentCost)}</TableCell>
                                   </TableRow>
                                   <TableRow>
-                                    <TableCell sx={{ py: 0.3, fontSize: '0.8rem' }}>Labour ({costBreakdown.estimatedTotalHours} total hrs)</TableCell>
+                                    <TableCell sx={{ py: 0.3, fontSize: '0.8rem' }}>
+                                      Labour ({pilotCount} pilot{pilotCount > 1 ? 's' : ''} × ${pilotRate}/hr
+                                      {hasChemOp ? ` + Chem Op × $${chemOpRate}/hr` : ''})
+                                    </TableCell>
                                     <TableCell align="right" sx={{ py: 0.3, fontSize: '0.8rem' }}>{formatCurrency(costBreakdown.labourCost)}</TableCell>
                                   </TableRow>
                                   {costBreakdown.vehicleCost > 0 && (

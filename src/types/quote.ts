@@ -107,6 +107,20 @@ export interface Kit {
   updatedAt: string;
 }
 
+// ─── Multi-Kit & Crew ─────────────────────────────────────────
+
+export interface KitSelection {
+  kitId: string;
+  quantity: number;
+}
+
+export interface CrewConfig {
+  pilotCount: number;
+  pilotRatePerHour: number;       // overridable per quote
+  hasChemOperator: boolean;
+  chemOperatorRatePerHour: number; // overridable per quote
+}
+
 // ─── Job Cost Breakdown ────────────────────────────────────────
 
 export interface JobCostBreakdown {
@@ -178,6 +192,7 @@ export interface QuoteConfig {
   defaultComplexMixFee: number;
   defaultHazardousPPEHourly: number;
   defaultComplexitySurchargePerHour: number;
+  defaultChemOperatorRatePerHour: number;
 
   // Chemical admin
   defaultChemicalAdminPercent: number;
@@ -243,7 +258,9 @@ export interface Quote {
   total: number;
 
   // Cost & margin tracking
-  kitId?: string;
+  kitId?: string;               // legacy single kit
+  kitSelections?: KitSelection[];
+  crew?: CrewConfig;
   costBreakdown?: JobCostBreakdown;
   margin?: QuoteMargin;
 

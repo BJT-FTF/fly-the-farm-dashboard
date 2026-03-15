@@ -130,6 +130,7 @@ export default function QuoteCreate() {
     defaultComplexMixFee: 75,
     defaultHazardousPPEHourly: 80,
     defaultComplexitySurchargePerHour: 80,
+    defaultChemOperatorRatePerHour: 45,
     defaultChemicalAdminPercent: 10,
     defaultMarkupPercent: 0,
     businessName: '',

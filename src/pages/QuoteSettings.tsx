@@ -126,6 +126,7 @@ export default function QuoteSettings() {
       defaultComplexMixFee: complexMixFee,
       defaultHazardousPPEHourly: hazPpeRate,
       defaultComplexitySurchargePerHour: complexityRate,
+      defaultChemOperatorRatePerHour: 45,
       defaultChemicalAdminPercent: chemAdmin,
       defaultMarkupPercent: markup,
       businessName,

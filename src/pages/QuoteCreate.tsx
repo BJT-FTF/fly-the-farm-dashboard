@@ -84,6 +84,30 @@ function newLineItem(partial: Partial<QuoteLineItem>): QuoteLineItem {
   };
 }
 
+function SectionCard({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card sx={{ borderRadius: 3 }}>
+      <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          {icon}
+          <Typography variant="subtitle1" fontWeight={700}>
+            {title}
+          </Typography>
+        </Stack>
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function QuoteCreate() {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -568,27 +592,6 @@ export default function QuoteCreate() {
 
   // ─── Section renderer helper ───────────────────────────────
 
-  const SectionCard = ({
-    icon,
-    title,
-    children,
-  }: {
-    icon: React.ReactNode;
-    title: string;
-    children: React.ReactNode;
-  }) => (
-    <Card sx={{ borderRadius: 3 }}>
-      <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
-          {icon}
-          <Typography variant="subtitle1" fontWeight={700}>
-            {title}
-          </Typography>
-        </Stack>
-        {children}
-      </CardContent>
-    </Card>
-  );
 
   return (
     <Box>

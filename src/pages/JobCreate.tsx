@@ -47,7 +47,9 @@ import {
   getPropertyById,
   getClientById,
   saveJob,
+  updateJob,
 } from '../services/fieldManagementStore';
+import { getQuoteById, updateQuote } from '../services/quoteStore';
 import { WeatherConditions, WeatherLogEntry, ChemicalEntry, SprayRecFileRef, BatchInfo, BatchChemicalBreakdown } from '../types/fieldManagement';
 import { getAllWeeds, getAllBrands, findTreatmentByBrand, getTreatmentById, getSeasonsForTreatment, getStatesForTreatment } from '../data/chemicals';
 import { getAllSurfactants, getSurfactantById, Surfactant } from '../data/surfactants';
@@ -152,6 +154,7 @@ export default function JobCreate() {
     };
   };
 
+  const [fromQuoteId, setFromQuoteId] = useState<string | null>(null);
   const [weedTarget, setWeedTarget] = useState('');
   const [chemicals, setChemicals] = useState<ChemicalEntry[]>(initial.chems);
   const [matchedTreatments, setMatchedTreatments] = useState<(WeedTreatment | null)[]>(initial.matched);
@@ -182,6 +185,19 @@ export default function JobCreate() {
       setBrewImported(true);
     }
   }, [importedBrew]);
+
+  // Check for job prefill data from QuoteDetail
+  useEffect(() => {
+    const raw = sessionStorage.getItem('ftf_job_prefill');
+    if (raw) {
+      sessionStorage.removeItem('ftf_job_prefill');
+      try {
+        const prefill = JSON.parse(raw);
+        if (prefill.jobDescription) setWeedTarget(prefill.jobDescription);
+        setFromQuoteId(prefill.fromQuoteId || null);
+      } catch { /* ignore */ }
+    }
+  }, []);
 
   if (!field || !property || !client) {
     return (
@@ -420,6 +436,14 @@ export default function JobCreate() {
       applicatorName,
       notes,
     });
+    if (fromQuoteId) {
+      updateJob(job.id, { quoteId: fromQuoteId });
+      const existingQuote = getQuoteById(fromQuoteId);
+      if (existingQuote) {
+        const existingJobIds = existingQuote.jobIds || [];
+        updateQuote(fromQuoteId, { jobIds: [...existingJobIds, job.id] });
+      }
+    }
     navigate(`/jobs/client/${clientId}/property/${propertyId}/field/${fieldId}/job/${job.id}`);
   };
 

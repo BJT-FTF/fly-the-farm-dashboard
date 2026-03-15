@@ -210,6 +210,145 @@ export function calculateJobCosts(
 }
 
 /**
+ * Calculate job costs with multiple kits and crew configuration.
+ *
+ * Per-drone costs (scale with quantity):
+ *   drone depreciation, battery depreciation, charger depreciation,
+ *   consumables (props/nozzles/filters), hull insurance
+ *
+ * Per-job costs (fixed, from primary kit):
+ *   generator fuel & depreciation, vehicle, public liability,
+ *   professional indemnity, licensing, software, PPE, overhead, maintenance
+ */
+export function calculateMultiKitJobCosts(
+  kits: { kit: Kit; quantity: number }[],
+  crew: { pilotCount: number; pilotRate: number; hasChemOp: boolean; chemOpRate: number },
+  estimatedFlightHours: number,
+  setupAndTravelHours: number,
+  travelKm: number,
+  operatorChemicalCost: number,
+  revenue: number,
+): JobCostBreakdown {
+  if (kits.length === 0) {
+    return {
+      droneDepreciationPerHour: 0, batteryDepreciationPerHour: 0,
+      chargerDepreciationPerHour: 0, generatorDepreciationPerHour: 0,
+      consumablesPerHour: 0, generatorFuelPerHour: 0, totalEquipmentCostPerHour: 0,
+      insurancePerHour: 0, licensingPerJob: 0, softwarePerJob: 0,
+      ppeSafetyPerJob: 0, maintenancePerHour: 0, overheadPercent: 0,
+      estimatedFlightHours, estimatedTotalHours: estimatedFlightHours + setupAndTravelHours,
+      travelKm, equipmentCost: 0, labourCost: 0, vehicleCost: 0,
+      insuranceCost: 0, fixedCostAllocation: 0, chemicalCostToOperator: operatorChemicalCost,
+      totalCost: operatorChemicalCost,
+    };
+  }
+
+  const primaryKit = kits[0].kit;
+  const primaryHrs = primaryKit.estimatedFlightHoursPerYear || 500;
+  const primaryJobs = primaryKit.estimatedJobsPerYear || 150;
+  const primaryRev = primaryKit.estimatedRevenuePerYear || 200000;
+  const totalHours = estimatedFlightHours + setupAndTravelHours;
+
+  // ── Per-drone costs (summed across all kits × quantities) ──
+  let totalDroneDepPerHour = 0;
+  let totalBatteryDepPerHour = 0;
+  let totalChargerDepPerHour = 0;
+  let totalConsumablesPerHour = 0;
+  let totalHullInsurancePerHour = 0;
+
+  for (const { kit, quantity } of kits) {
+    const hrs = kit.estimatedFlightHoursPerYear || 500;
+
+    const droneDepPerHour = kit.dronePurchasePrice / (kit.droneLifespanYears * hrs);
+    const totalBatteryHours = kit.batteryCount * kit.batteryCycleLife * kit.flightMinutesPerCharge / 60;
+    const totalBatteryCost = kit.batteryCount * kit.batteryPriceEach;
+    const batteryDepPerHour = totalBatteryHours > 0 ? totalBatteryCost / totalBatteryHours : 0;
+    const chargerDepPerHour = kit.chargerPrice / (kit.chargerLifespanYears * hrs);
+    const consumables = kit.propsCostPerHour + kit.nozzlesCostPerHour +
+      kit.filtersCostPerHour + kit.pumpServiceCostPerHour + kit.otherConsumablesPerHour;
+    const hullPerHour = kit.hullInsuranceAnnual / hrs;
+
+    totalDroneDepPerHour += droneDepPerHour * quantity;
+    totalBatteryDepPerHour += batteryDepPerHour * quantity;
+    totalChargerDepPerHour += chargerDepPerHour * quantity;
+    totalConsumablesPerHour += consumables * quantity;
+    totalHullInsurancePerHour += hullPerHour * quantity;
+  }
+
+  // Workers comp scales per crew member
+  const crewCount = crew.pilotCount + (crew.hasChemOp ? 1 : 0);
+  const workersCompPerHour = (primaryKit.workersCompAnnual / primaryHrs) * crewCount;
+
+  // ── Per-job costs (fixed, from primary kit) ──
+  const genDepPerHour = primaryKit.generatorPrice / (primaryKit.generatorLifespanYears * primaryHrs);
+  const fuelPerHour = primaryKit.generatorFuelCostPerHour;
+  const publicLiabilityPerHour = primaryKit.publicLiabilityAnnual / primaryHrs;
+  const profIndemnityPerHour = primaryKit.professionalIndemnityAnnual / primaryHrs;
+  const maintenancePerHour = primaryKit.maintenanceBudgetAnnual / primaryHrs;
+  const licensingPerJob = primaryKit.licensingCostsAnnual / primaryJobs;
+  const softwarePerJob = primaryKit.softwareCostsAnnual / primaryJobs;
+  const ppeSafetyPerJob = primaryKit.ppeSafetyAnnual / primaryJobs;
+  const overheadPercent = primaryRev > 0 ? (primaryKit.overheadAnnual / primaryRev) * 100 : 0;
+
+  // ── Totals ──
+  const perDroneEquipPerHour = totalDroneDepPerHour + totalBatteryDepPerHour +
+    totalChargerDepPerHour + totalConsumablesPerHour;
+  const perJobEquipPerHour = genDepPerHour + fuelPerHour;
+  const totalEquipmentPerHour = perDroneEquipPerHour + perJobEquipPerHour;
+
+  const equipmentCost = r2(totalEquipmentPerHour * estimatedFlightHours);
+
+  // Insurance (per-drone: hull; per-job: public liability, prof indemnity; per-crew: workers comp)
+  const insurancePerHour = totalHullInsurancePerHour + publicLiabilityPerHour +
+    profIndemnityPerHour + workersCompPerHour;
+  const insuranceCost = r2(insurancePerHour * estimatedFlightHours);
+
+  // Labour: pilots + optional chem operator
+  const pilotLabour = crew.pilotCount * crew.pilotRate * totalHours;
+  const chemOpLabour = crew.hasChemOp ? crew.chemOpRate * totalHours : 0;
+  const labourCost = r2(pilotLabour + chemOpLabour);
+
+  const vehicleCost = r2(primaryKit.vehicleCostPerKm * travelKm);
+
+  const fixedCosts = r2(
+    licensingPerJob + softwarePerJob + ppeSafetyPerJob +
+    maintenancePerHour * estimatedFlightHours
+  );
+  const overheadAmount = r2(revenue * (overheadPercent / 100));
+
+  const totalCost = r2(
+    equipmentCost + labourCost + vehicleCost + insuranceCost +
+    fixedCosts + overheadAmount + operatorChemicalCost
+  );
+
+  return {
+    droneDepreciationPerHour: r2(totalDroneDepPerHour),
+    batteryDepreciationPerHour: r2(totalBatteryDepPerHour),
+    chargerDepreciationPerHour: r2(totalChargerDepPerHour),
+    generatorDepreciationPerHour: r2(genDepPerHour),
+    consumablesPerHour: r2(totalConsumablesPerHour),
+    generatorFuelPerHour: r2(fuelPerHour),
+    totalEquipmentCostPerHour: r2(totalEquipmentPerHour),
+    insurancePerHour: r2(insurancePerHour),
+    licensingPerJob: r2(licensingPerJob),
+    softwarePerJob: r2(softwarePerJob),
+    ppeSafetyPerJob: r2(ppeSafetyPerJob),
+    maintenancePerHour: r2(maintenancePerHour),
+    overheadPercent: r2(overheadPercent),
+    estimatedFlightHours,
+    estimatedTotalHours: totalHours,
+    travelKm,
+    equipmentCost,
+    labourCost,
+    vehicleCost,
+    insuranceCost,
+    fixedCostAllocation: r2(fixedCosts + overheadAmount),
+    chemicalCostToOperator: operatorChemicalCost,
+    totalCost,
+  };
+}
+
+/**
  * Calculate margin from revenue and costs.
  */
 export function calculateMargin(

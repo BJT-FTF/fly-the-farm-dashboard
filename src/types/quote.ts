@@ -222,6 +222,7 @@ export interface Quote {
   clientId: string;
   propertyId?: string;
   fieldIds?: string[];
+  jobIds?: string[];  // Linked job(s) created from this quote
 
   status: QuoteStatus;
   pricingMode: PricingMode;

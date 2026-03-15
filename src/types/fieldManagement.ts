@@ -158,6 +158,7 @@ export interface JobRecord {
   applicatorName: string;
 
   notes: string;
+  quoteId?: string;  // Linked quote if created from/for this job
   createdAt: string;
   updatedAt: string;
 }

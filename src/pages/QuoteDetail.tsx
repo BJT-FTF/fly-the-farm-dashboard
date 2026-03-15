@@ -25,6 +25,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PrintIcon from '@mui/icons-material/Print';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { getQuoteById, updateQuote, deleteQuote, getQuoteConfig } from '../services/quoteStore';
 import { getClients, getPropertiesByClient } from '../services/fieldManagementStore';
@@ -125,11 +126,37 @@ export default function QuoteDetail() {
             <Button variant="outlined" startIcon={<PrintIcon />} onClick={handlePrint}>
               Print
             </Button>
+            {quote.status === 'accepted' && quote.fieldIds?.[0] && (
+              <Button
+                variant="outlined"
+                startIcon={<AssignmentIcon />}
+                onClick={() => {
+                  const prefill = {
+                    fromQuoteId: quote.id,
+                    clientId: quote.clientId,
+                    propertyId: quote.propertyId,
+                    fieldId: quote.fieldIds?.[0],
+                    jobDescription: quote.jobDescription,
+                  };
+                  sessionStorage.setItem('ftf_job_prefill', JSON.stringify(prefill));
+                  navigate(`/jobs/client/${quote.clientId}/property/${quote.propertyId}/field/${quote.fieldIds?.[0]}/new-job`);
+                }}
+                sx={{ borderRadius: '10px', fontWeight: 700 }}
+              >
+                Create Job
+              </Button>
+            )}
             <Button variant="outlined" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>
               Delete
             </Button>
           </Stack>
         </Stack>
+
+        {quote.jobIds && quote.jobIds.length > 0 && (
+          <Alert severity="info" sx={{ mb: 2, borderRadius: '12px' }}>
+            This quote has {quote.jobIds.length} linked job(s).
+          </Alert>
+        )}
 
         {/* Printable quote */}
         <Card sx={{ borderRadius: 3, mb: 3 }} id="quote-printable">

@@ -100,6 +100,7 @@ export default function QuoteSettings() {
   const [complexMixFee, setComplexMixFee] = useState(existing?.defaultComplexMixFee || 75);
   const [hazPpeRate, setHazPpeRate] = useState(existing?.defaultHazardousPPEHourly || 80);
   const [complexityRate, setComplexityRate] = useState(existing?.defaultComplexitySurchargePerHour || 80);
+  const [chemOperatorRate, setChemOperatorRate] = useState(existing?.defaultChemOperatorRatePerHour || 45);
 
   const [chemAdmin, setChemAdmin] = useState(existing?.defaultChemicalAdminPercent || 10);
   const [markup, setMarkup] = useState(existing?.defaultMarkupPercent || 0);
@@ -126,7 +127,7 @@ export default function QuoteSettings() {
       defaultComplexMixFee: complexMixFee,
       defaultHazardousPPEHourly: hazPpeRate,
       defaultComplexitySurchargePerHour: complexityRate,
-      defaultChemOperatorRatePerHour: 45,
+      defaultChemOperatorRatePerHour: chemOperatorRate,
       defaultChemicalAdminPercent: chemAdmin,
       defaultMarkupPercent: markup,
       businessName,
@@ -371,6 +372,7 @@ export default function QuoteSettings() {
               <TextField label="Complex Mix Fee ($)" type="number" value={complexMixFee} onChange={(e) => setComplexMixFee(parseFloat(e.target.value) || 0)} size="small" sx={{ width: 160 }} />
               <TextField label="Haz PPE $/hr" type="number" value={hazPpeRate} onChange={(e) => setHazPpeRate(parseFloat(e.target.value) || 0)} size="small" sx={{ width: 130 }} />
               <TextField label="Complexity $/hr" type="number" value={complexityRate} onChange={(e) => setComplexityRate(parseFloat(e.target.value) || 0)} size="small" sx={{ width: 140 }} />
+              <TextField label="Chem Operator $/hr" type="number" value={chemOperatorRate} onChange={(e) => setChemOperatorRate(parseFloat(e.target.value) || 0)} size="small" sx={{ width: 160 }} />
             </Stack>
 
             <SectionTitle>Margins</SectionTitle>

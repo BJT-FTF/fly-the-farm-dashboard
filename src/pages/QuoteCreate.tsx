@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Typography,
@@ -27,6 +27,10 @@ import {
   ToggleButtonGroup,
   alpha,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
@@ -43,11 +47,15 @@ import {
   getClients,
   getPropertiesByClient,
   getFieldsByProperty,
+  getFieldById,
+  saveClient,
+  updateJob,
 } from '../services/fieldManagementStore';
 import {
   getQuoteConfig,
   saveQuoteConfig,
   saveQuote,
+  updateQuote,
   generateQuoteNumber,
   getKits,
   getDefaultKit,
@@ -118,10 +126,33 @@ export default function QuoteCreate() {
   // ─── Form state ────────────────────────────────────────────
 
   // Client / Property / Field
-  const allClients = useMemo(() => getClients(), []);
+  const [clientRefresh, setClientRefresh] = useState(0);
+  const allClients = useMemo(() => getClients(), [clientRefresh]);
   const [clientId, setClientId] = useState<string | null>(null);
   const [propertyId, setPropertyId] = useState<string | null>(null);
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
+
+  // Prefill from job (Task 3)
+  const [fromJobId, setFromJobId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const raw = sessionStorage.getItem('ftf_quote_prefill');
+    if (raw) {
+      sessionStorage.removeItem('ftf_quote_prefill');
+      try {
+        const prefill = JSON.parse(raw);
+        if (prefill.clientId) setClientId(prefill.clientId);
+        if (prefill.propertyId) setPropertyId(prefill.propertyId);
+        if (prefill.fieldIds) setSelectedFieldIds(prefill.fieldIds);
+        if (prefill.jobDescription) setJobDescription(prefill.jobDescription);
+        setFromJobId(prefill.fromJobId || null);
+      } catch { /* ignore bad data */ }
+    }
+  }, []);
+
+  // Quick-add client dialog (Task 6)
+  const [quickClientOpen, setQuickClientOpen] = useState(false);
+  const [quickClient, setQuickClient] = useState({ name: '', phone: '', email: '' });
 
   const clientProperties = useMemo(
     () => (clientId ? getPropertiesByClient(clientId) : []),
@@ -447,6 +478,21 @@ export default function QuoteCreate() {
       .reduce((sum, f) => sum + f.sizeHa, 0);
   }, [propertyFields, selectedFieldIds]);
 
+  // Task 7: Calculate total hectares from field boundaries (works even with prefilled fields)
+  const totalHectares = useMemo(() => {
+    if (!selectedFieldIds.length) return 0;
+    return selectedFieldIds.reduce((sum, fid) => {
+      const f = getFieldById(fid);
+      return sum + (f?.sizeHa || 0);
+    }, 0);
+  }, [selectedFieldIds]);
+
+  useEffect(() => {
+    if (totalHectares > 0) {
+      setHectaresStr(String(Math.round(totalHectares * 100) / 100));
+    }
+  }, [totalHectares]);
+
   // Cost & margin analysis
   const operatorChemCost = useMemo(() => {
     if (chemSupply !== 'operator') return 0;
@@ -492,6 +538,7 @@ export default function QuoteCreate() {
       clientId,
       propertyId: propertyId || undefined,
       fieldIds: selectedFieldIds.length > 0 ? selectedFieldIds : undefined,
+      jobIds: fromJobId ? [fromJobId] : undefined,
       status: 'draft',
       pricingMode,
       jobDescription,
@@ -509,6 +556,12 @@ export default function QuoteCreate() {
       sentAt: null,
       acceptedAt: null,
     });
+
+    // Link quote back to job if created from a job (Task 3)
+    if (fromJobId) {
+      updateJob(fromJobId, { quoteId: quote.id });
+      updateQuote(quote.id, { jobIds: [fromJobId] });
+    }
 
     navigate(`/quotes/${quote.id}`);
   };
@@ -554,19 +607,30 @@ export default function QuoteCreate() {
         {/* ─── Client & Job ─────────────────────────────────── */}
         <SectionCard icon={<ReceiptLongIcon color="primary" />} title="Client & Job Details">
           <Stack spacing={2}>
-            <Autocomplete
-              options={allClients}
-              getOptionLabel={(c) => c.name}
-              value={allClients.find((c) => c.id === clientId) || null}
-              onChange={(_, v) => {
-                setClientId(v?.id || null);
-                setPropertyId(null);
-                setSelectedFieldIds([]);
-              }}
-              renderInput={(params) => (
-                <TextField {...params} label="Client *" size="small" />
-              )}
-            />
+            <Stack direction="row" alignItems="center">
+              <Autocomplete
+                options={allClients}
+                getOptionLabel={(c) => c.name}
+                value={allClients.find((c) => c.id === clientId) || null}
+                onChange={(_, v) => {
+                  setClientId(v?.id || null);
+                  setPropertyId(null);
+                  setSelectedFieldIds([]);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Client *" size="small" />
+                )}
+                sx={{ flex: 1 }}
+              />
+              <Button
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={() => setQuickClientOpen(true)}
+                sx={{ ml: 1, borderRadius: '10px', fontWeight: 700, whiteSpace: 'nowrap' }}
+              >
+                New Client
+              </Button>
+            </Stack>
 
             <Stack direction="row" spacing={2}>
               {clientId && (
@@ -1528,6 +1592,41 @@ export default function QuoteCreate() {
           </Button>
         </Stack>
       </Stack>
+
+      {/* Quick Add Client Dialog (Task 6) */}
+      <Dialog open={quickClientOpen} onClose={() => setQuickClientOpen(false)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: '16px' } }}>
+        <DialogTitle sx={{ fontWeight: 700 }}>Quick Add Client</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <TextField label="Name" value={quickClient.name} onChange={(e) => setQuickClient({ ...quickClient, name: e.target.value })} fullWidth required />
+            <TextField label="Phone" value={quickClient.phone} onChange={(e) => setQuickClient({ ...quickClient, phone: e.target.value })} fullWidth />
+            <TextField label="Email" value={quickClient.email} onChange={(e) => setQuickClient({ ...quickClient, email: e.target.value })} fullWidth />
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setQuickClientOpen(false)}>Cancel</Button>
+          <Button
+            variant="contained"
+            disabled={!quickClient.name.trim()}
+            onClick={() => {
+              const newClient = saveClient({
+                contractorUserId: userId,
+                name: quickClient.name.trim(),
+                phone: quickClient.phone.trim(),
+                email: quickClient.email.trim(),
+                notes: '',
+              });
+              setClientId(newClient.id);
+              setClientRefresh((n) => n + 1);
+              setQuickClientOpen(false);
+              setQuickClient({ name: '', phone: '', email: '' });
+            }}
+            sx={{ borderRadius: '10px', fontWeight: 700 }}
+          >
+            Add Client
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

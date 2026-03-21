@@ -20,10 +20,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
   alpha,
   useTheme,
 } from '@mui/material';
@@ -109,7 +105,7 @@ export default function ActualDetail() {
 
   const [actual, setActual] = useState<JobActual | undefined>(() => getActualById(actualId || ''));
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [pdfMenuAnchor, setPdfMenuAnchor] = useState<null | HTMLElement>(null);
+  const [pdfDialogOpen, setPdfDialogOpen] = useState(false);
 
   if (!actual) {
     return (
@@ -216,43 +212,12 @@ export default function ActualDetail() {
           <Button
             size="small"
             variant="contained"
-            onClick={(e) => setPdfMenuAnchor(e.currentTarget)}
+            onClick={() => setPdfDialogOpen(true)}
             startIcon={<PictureAsPdfIcon />}
             sx={{ borderRadius: '10px', fontWeight: 700, textTransform: 'none' }}
           >
             Export PDF
           </Button>
-          <Menu
-            anchorEl={pdfMenuAnchor}
-            open={Boolean(pdfMenuAnchor)}
-            onClose={() => setPdfMenuAnchor(null)}
-            PaperProps={{ sx: { borderRadius: '12px', mt: 0.5 } }}
-          >
-            <MenuItem
-              onClick={() => {
-                generateActualReport(actual, { includePnL: false });
-                setPdfMenuAnchor(null);
-              }}
-            >
-              <ListItemIcon><DescriptionIcon fontSize="small" /></ListItemIcon>
-              <ListItemText
-                primary="Job Summary"
-                secondary="Clean report — no financials"
-              />
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                generateActualReport(actual, { includePnL: true });
-                setPdfMenuAnchor(null);
-              }}
-            >
-              <ListItemIcon><AssessmentIcon fontSize="small" /></ListItemIcon>
-              <ListItemText
-                primary="Full P&L Report"
-                secondary="Includes costs, margins & comparisons"
-              />
-            </MenuItem>
-          </Menu>
           <Button
             size="small"
             variant="outlined"
@@ -739,6 +704,71 @@ export default function ActualDetail() {
           </Card>
         )}
       </Stack>
+
+      {/* PDF Export Choice Dialog */}
+      <Dialog
+        open={pdfDialogOpen}
+        onClose={() => setPdfDialogOpen(false)}
+        PaperProps={{ sx: { borderRadius: '16px', maxWidth: 400 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 700 }}>Export PDF Report</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Would you like a summary or complete report with P&L?
+          </Typography>
+          <Stack spacing={1.5}>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<DescriptionIcon />}
+              onClick={() => {
+                generateActualReport(actual, { includePnL: false });
+                setPdfDialogOpen(false);
+              }}
+              sx={{
+                borderRadius: '12px',
+                py: 1.5,
+                textTransform: 'none',
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+              }}
+            >
+              <Box>
+                <Typography variant="body2" fontWeight={700}>Job Summary</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Clean report — no financial numbers
+                </Typography>
+              </Box>
+            </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<AssessmentIcon />}
+              onClick={() => {
+                generateActualReport(actual, { includePnL: true });
+                setPdfDialogOpen(false);
+              }}
+              sx={{
+                borderRadius: '12px',
+                py: 1.5,
+                textTransform: 'none',
+                justifyContent: 'flex-start',
+                textAlign: 'left',
+              }}
+            >
+              <Box>
+                <Typography variant="body2" fontWeight={700}>Complete with P&L</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Includes costs, margins & quote comparison
+                </Typography>
+              </Box>
+            </Button>
+          </Stack>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
+          <Button onClick={() => setPdfDialogOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Delete Confirm Dialog */}
       <Dialog

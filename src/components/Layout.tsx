@@ -27,6 +27,7 @@ import GrassIcon from '@mui/icons-material/Grass';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LogoutIcon from '@mui/icons-material/Logout';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
@@ -67,6 +68,7 @@ export default function Layout() {
     { label: 'Calculator', path: '/calculator', icon: <CalculateIcon />, roles: ['admin', 'contractor'] },
     { label: 'Jobs', path: '/jobs', icon: <AssignmentIcon />, roles: ['admin', 'contractor', 'client'] },
     { label: 'Quotes', path: '/quotes', icon: <ReceiptLongIcon />, roles: ['admin', 'contractor'] },
+    { label: 'Financials', path: '/financials', icon: <AccountBalanceIcon />, roles: ['admin', 'contractor'] },
     { label: 'Admin', path: '/admin', icon: <AdminPanelSettingsIcon />, roles: ['admin'] },
   ].filter((item) => !user?.role || item.roles.includes(user.role));
 

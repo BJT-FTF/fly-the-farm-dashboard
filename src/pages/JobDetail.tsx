@@ -45,6 +45,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import DownloadIcon from '@mui/icons-material/Download';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import {
   getJobById,
   getFieldById,
@@ -55,6 +56,7 @@ import {
   saveOutcome,
   updateOutcome,
 } from '../services/fieldManagementStore';
+import { getActualByJobId } from '../services/financialsStore';
 import { JobOutcome, EfficacyRating, PhotoRef } from '../types/fieldManagement';
 import PhotoUpload from '../components/PhotoUpload';
 
@@ -78,6 +80,7 @@ export default function JobDetail() {
   const property = getPropertyById(propertyId || '');
   const client = getClientById(clientId || '');
 
+  const existingActual = getActualByJobId(jobId || '');
   const [outcome, setOutcome] = useState(() => getOutcomeByJob(jobId || ''));
   const [outcomeDialogOpen, setOutcomeDialogOpen] = useState(false);
   const [outcomeForm, setOutcomeForm] = useState({
@@ -202,6 +205,26 @@ export default function JobDetail() {
           >
             <ReceiptLongIcon fontSize="small" />
           </IconButton>
+          <IconButton
+            size="small"
+            onClick={() => {
+              const prefill = {
+                jobId: job.id,
+                clientId: job.clientId,
+                propertyId: job.propertyId,
+                fieldId: job.fieldId,
+                title: `${job.weedTarget} — ${client.name}`,
+                jobDate: job.dateSprayed,
+                quoteId: job.quoteId || undefined,
+              };
+              sessionStorage.setItem('ftf_actual_prefill', JSON.stringify(prefill));
+              navigate('/financials/new');
+            }}
+            sx={{ color: '#d4782f' }}
+            title="Record Actuals"
+          >
+            <AccountBalanceIcon fontSize="small" />
+          </IconButton>
           <IconButton size="small" onClick={() => setDeleteConfirm(true)} sx={{ color: 'error.main' }}>
             <DeleteIcon fontSize="small" />
           </IconButton>
@@ -215,6 +238,16 @@ export default function JobDetail() {
           onClick={() => navigate(`/quotes/${job.quoteId}`)}
           sx={{ cursor: 'pointer', fontWeight: 700, mb: 2 }}
           color="secondary"
+          variant="outlined"
+        />
+      )}
+      {existingActual && (
+        <Chip
+          label="View Actuals"
+          size="small"
+          onClick={() => navigate(`/financials/${existingActual.id}`)}
+          sx={{ cursor: 'pointer', fontWeight: 700, mb: 2 }}
+          color="warning"
           variant="outlined"
         />
       )}

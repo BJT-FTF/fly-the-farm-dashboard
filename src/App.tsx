@@ -22,6 +22,9 @@ import QuoteList from './pages/QuoteList';
 import QuoteCreate from './pages/QuoteCreate';
 import QuoteDetail from './pages/QuoteDetail';
 import QuoteSettings from './pages/QuoteSettings';
+import FinancialsList from './pages/FinancialsList';
+import ActualCreate from './pages/ActualCreate';
+import ActualDetail from './pages/ActualDetail';
 
 function App() {
   return (
@@ -53,6 +56,9 @@ function App() {
           <Route path="/quotes/new" element={<QuoteCreate />} />
           <Route path="/quotes/settings" element={<QuoteSettings />} />
           <Route path="/quotes/:quoteId" element={<QuoteDetail />} />
+          <Route path="/financials" element={<FinancialsList />} />
+          <Route path="/financials/new" element={<ActualCreate />} />
+          <Route path="/financials/:actualId" element={<ActualDetail />} />
           <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>

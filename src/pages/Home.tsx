@@ -15,6 +15,7 @@ import GrassIcon from '@mui/icons-material/Grass';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
@@ -53,6 +54,14 @@ export default function Home() {
       icon: <ReceiptLongIcon />,
       color: '#6a4c93',
       path: '/quotes',
+      ready: true,
+    },
+    {
+      title: 'Financials',
+      description: 'Track actual job costs against quotes. See real margins and improve future pricing.',
+      icon: <AccountBalanceIcon />,
+      color: '#d4782f',
+      path: '/financials',
       ready: true,
     },
   ];
@@ -101,10 +110,10 @@ export default function Home() {
       </Box>
 
       {/* Tool cards */}
-      <Box className="ftf-animate-in-delay-1" sx={{ maxWidth: 1000, mx: 'auto' }}>
+      <Box className="ftf-animate-in-delay-1" sx={{ maxWidth: 1200, mx: 'auto' }}>
         <Grid container spacing={3}>
           {tools.map((tool) => (
-            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={tool.title}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={tool.title}>
               <Card
                 elevation={0}
                 sx={{

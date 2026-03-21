@@ -20,12 +20,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
   alpha,
   useTheme,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DescriptionIcon from '@mui/icons-material/Description';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -103,6 +109,7 @@ export default function ActualDetail() {
 
   const [actual, setActual] = useState<JobActual | undefined>(() => getActualById(actualId || ''));
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [pdfMenuAnchor, setPdfMenuAnchor] = useState<null | HTMLElement>(null);
 
   if (!actual) {
     return (
@@ -209,12 +216,43 @@ export default function ActualDetail() {
           <Button
             size="small"
             variant="contained"
-            onClick={() => generateActualReport(actual)}
+            onClick={(e) => setPdfMenuAnchor(e.currentTarget)}
             startIcon={<PictureAsPdfIcon />}
             sx={{ borderRadius: '10px', fontWeight: 700, textTransform: 'none' }}
           >
             Export PDF
           </Button>
+          <Menu
+            anchorEl={pdfMenuAnchor}
+            open={Boolean(pdfMenuAnchor)}
+            onClose={() => setPdfMenuAnchor(null)}
+            PaperProps={{ sx: { borderRadius: '12px', mt: 0.5 } }}
+          >
+            <MenuItem
+              onClick={() => {
+                generateActualReport(actual, { includePnL: false });
+                setPdfMenuAnchor(null);
+              }}
+            >
+              <ListItemIcon><DescriptionIcon fontSize="small" /></ListItemIcon>
+              <ListItemText
+                primary="Job Summary"
+                secondary="Clean report — no financials"
+              />
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                generateActualReport(actual, { includePnL: true });
+                setPdfMenuAnchor(null);
+              }}
+            >
+              <ListItemIcon><AssessmentIcon fontSize="small" /></ListItemIcon>
+              <ListItemText
+                primary="Full P&L Report"
+                secondary="Includes costs, margins & comparisons"
+              />
+            </MenuItem>
+          </Menu>
           <Button
             size="small"
             variant="outlined"

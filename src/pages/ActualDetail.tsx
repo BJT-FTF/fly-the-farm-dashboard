@@ -25,6 +25,7 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
 import PeopleIcon from '@mui/icons-material/People';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
@@ -39,6 +40,7 @@ import { formatCurrency } from '../utils/quoteCalculator';
 import { useAuth } from '../contexts/AuthContext';
 import { JobActual, CostLineItem } from '../types/financials';
 import { Quote } from '../types/quote';
+import { generateActualReport } from '../utils/actualReportPdf';
 
 // ─── Helper components (defined outside main component) ─────────
 
@@ -204,6 +206,15 @@ export default function ActualDetail() {
           </Typography>
         </Box>
         <Stack direction="row" spacing={1} alignItems="center">
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => generateActualReport(actual)}
+            startIcon={<PictureAsPdfIcon />}
+            sx={{ borderRadius: '10px', fontWeight: 700, textTransform: 'none' }}
+          >
+            Export PDF
+          </Button>
           <Button
             size="small"
             variant="outlined"

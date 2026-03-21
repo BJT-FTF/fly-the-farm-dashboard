@@ -323,9 +323,84 @@ export default function ActualCreate() {
       const quote = getQuoteById(quoteId);
       if (!quote) return;
 
+      // Revenue
       setRevenue(quote.total);
       setRevenueStr(String(quote.total));
+
+      // Client
       if (quote.clientId) setSelectedClientId(quote.clientId);
+
+      // Rate type & rate from pricing mode
+      if (quote.pricingMode === 'per-hectare') {
+        setRateType('hectare');
+        // Find the hectare line item to get rate and quantity
+        const haLine = quote.lineItems.find((li) => li.type === 'broadacre-spray');
+        if (haLine) {
+          setRate(haLine.unitRate);
+          setRateStr(String(haLine.unitRate));
+          setHectares(haLine.quantity);
+          setHectaresStr(String(haLine.quantity));
+        }
+      } else if (quote.pricingMode === 'per-hour') {
+        setRateType('hourly');
+        const hrLine = quote.lineItems.find((li) => li.type === 'spot-spray');
+        if (hrLine) {
+          setRate(hrLine.unitRate);
+          setRateStr(String(hrLine.unitRate));
+        }
+      } else if (quote.pricingMode === 'daily-contract') {
+        setRateType('hourly');
+        // Convert daily rate to hourly estimate (assume 8hr day)
+        const dayLine = quote.lineItems.find((li) => li.type === 'daily-contract');
+        if (dayLine) {
+          const hourlyEstimate = Math.round((dayLine.unitRate / 8) * 100) / 100;
+          setRate(hourlyEstimate);
+          setRateStr(String(hourlyEstimate));
+        }
+      }
+
+      // Kit selections
+      if (quote.kitSelections && quote.kitSelections.length > 0) {
+        setKitSelections(quote.kitSelections.map((ks) => ({ kitId: ks.kitId, quantity: ks.quantity })));
+      }
+
+      // Crew config → labour
+      if (quote.crew) {
+        setPilotCount(quote.crew.pilotCount);
+        setPilotRate(quote.crew.pilotRatePerHour);
+        setPilotRateStr(String(quote.crew.pilotRatePerHour));
+        setHasChemOp(quote.crew.hasChemOperator);
+        if (quote.crew.hasChemOperator) {
+          setChemOpRate(quote.crew.chemOperatorRatePerHour);
+          setChemOpRateStr(String(quote.crew.chemOperatorRatePerHour));
+        }
+      }
+
+      // Travel — pull vehicle cost per km from kit
+      if (quote.costBreakdown) {
+        if (quote.costBreakdown.travelKm > 0) {
+          setKilometres(quote.costBreakdown.travelKm);
+          setKilometresStr(String(quote.costBreakdown.travelKm));
+        }
+      }
+      // Travel line item for per-km rate
+      const travelLine = quote.lineItems.find((li) => li.type === 'travel');
+      if (travelLine && travelLine.unitRate > 0) {
+        setVehicleCostPerKm(travelLine.unitRate);
+        setVehicleCostPerKmStr(String(travelLine.unitRate));
+      }
+
+      // Chemical cost
+      const chemLine = quote.lineItems.find((li) => li.type === 'chemical-cost');
+      if (chemLine) {
+        setChemicalCost(chemLine.amount);
+        setChemicalCostStr(String(chemLine.amount));
+      }
+
+      // Title from job description
+      if (quote.jobDescription) {
+        setTitle(quote.jobDescription);
+      }
     },
     [],
   );

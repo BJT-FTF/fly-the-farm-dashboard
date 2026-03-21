@@ -203,6 +203,11 @@ export default function ActualCreate() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+  const [rateType, setRateType] = useState<'hourly' | 'hectare'>('hourly');
+  const [rate, setRate] = useState(0);
+  const [rateStr, setRateStr] = useState('');
+  const [hectares, setHectares] = useState(0);
+  const [hectaresStr, setHectaresStr] = useState('');
   const [revenue, setRevenue] = useState(0);
   const [revenueStr, setRevenueStr] = useState('');
   const [revenueNotes, setRevenueNotes] = useState('');
@@ -367,6 +372,22 @@ export default function ActualCreate() {
     );
   }, []);
 
+  // ─── Auto-calculate revenue from rate ────────────
+  useEffect(() => {
+    if (rate <= 0) return;
+    if (rateType === 'hourly' && totalHours > 0) {
+      const calc = rate * totalHours;
+      setRevenue(calc);
+      setRevenueStr(String(Math.round(calc * 100) / 100));
+    } else if (rateType === 'hectare' && hectares > 0) {
+      const calc = rate * hectares;
+      setRevenue(calc);
+      setRevenueStr(String(Math.round(calc * 100) / 100));
+    }
+  }, [rate, rateType, totalHours, hectares]);
+
+  const effectiveHourlyRate = totalHours > 0 ? revenue / totalHours : 0;
+
   // ─── Kit helpers ───────────────────────────────────
   const addKit = () => {
     if (allKits.length === 0) return;
@@ -446,7 +467,11 @@ export default function ActualCreate() {
       totalDays,
       totalHours,
       status,
+      rateType,
+      rate,
+      hectares: rateType === 'hectare' ? hectares : undefined,
       revenue,
+      effectiveHourlyRate: Math.round(effectiveHourlyRate * 100) / 100,
       revenueNotes,
       equipment: {
         kitSelections: kitSelections as KitSelection[],
@@ -678,6 +703,53 @@ export default function ActualCreate() {
               )}
             />
 
+            {/* Rate & Revenue */}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+              <TextField
+                label="Rate Type"
+                select
+                value={rateType}
+                onChange={(e) => setRateType(e.target.value as 'hourly' | 'hectare')}
+                size="small"
+                sx={{ width: 150 }}
+              >
+                <MenuItem value="hourly">Per Hour</MenuItem>
+                <MenuItem value="hectare">Per Hectare</MenuItem>
+              </TextField>
+              <TextField
+                label={rateType === 'hourly' ? 'Rate ($/hr)' : 'Rate ($/ha)'}
+                type="number"
+                value={rateStr}
+                onChange={(e) => {
+                  setRateStr(e.target.value);
+                  setRate(parseFloat(e.target.value) || 0);
+                }}
+                size="small"
+                sx={{ width: 140 }}
+              />
+              {rateType === 'hectare' && (
+                <TextField
+                  label="Hectares"
+                  type="number"
+                  value={hectaresStr}
+                  onChange={(e) => {
+                    setHectaresStr(e.target.value);
+                    setHectares(parseFloat(e.target.value) || 0);
+                  }}
+                  size="small"
+                  sx={{ width: 130 }}
+                />
+              )}
+              {effectiveHourlyRate > 0 && (
+                <Chip
+                  label={`Effective: ${formatCurrency(effectiveHourlyRate)}/hr`}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ fontWeight: 700 }}
+                />
+              )}
+            </Stack>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 label="Revenue ($)"
@@ -689,6 +761,7 @@ export default function ActualCreate() {
                 }}
                 size="small"
                 sx={{ width: 180 }}
+                helperText={rate > 0 ? 'Auto-calculated from rate' : undefined}
               />
               <TextField
                 label="Revenue Notes"

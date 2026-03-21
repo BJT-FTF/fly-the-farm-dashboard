@@ -79,8 +79,12 @@ export interface JobActual {
   totalHours: number;
   status: ActualStatus;
 
-  // Revenue
+  // Rate & Revenue
+  rateType: 'hourly' | 'hectare';
+  rate: number;
+  hectares?: number;
   revenue: number;
+  effectiveHourlyRate: number;
   revenueNotes: string;
 
   // Costs

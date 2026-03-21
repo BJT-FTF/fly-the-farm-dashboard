@@ -314,7 +314,49 @@ export default function ActualDetail() {
                   {actual.grossMarginPercent.toFixed(1)}%
                 </Typography>
               </Box>
+              {actual.rate > 0 && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Rate
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 800,
+                      color: '#6a1b9a',
+                      fontFamily: '"Outfit", system-ui',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {formatCurrency(actual.rate)}/{actual.rateType === 'hourly' ? 'hr' : 'ha'}
+                  </Typography>
+                </Box>
+              )}
+              {actual.effectiveHourlyRate > 0 && (
+                <Box>
+                  <Typography variant="caption" color="text.secondary">
+                    Effective $/hr
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 800,
+                      color: '#00695c',
+                      fontFamily: '"Outfit", system-ui',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {formatCurrency(actual.effectiveHourlyRate)}
+                  </Typography>
+                </Box>
+              )}
             </Stack>
+            {actual.rateType === 'hectare' && actual.hectares && actual.hectares > 0 && (
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {actual.hectares} ha @ {formatCurrency(actual.rate)}/ha = {formatCurrency(actual.revenue)} revenue
+                {actual.totalHours > 0 && ` \u00F7 ${actual.totalHours} hrs = ${formatCurrency(actual.effectiveHourlyRate)}/hr`}
+              </Typography>
+            )}
             {quote && quotedMargin != null && (
               <Typography
                 variant="body2"

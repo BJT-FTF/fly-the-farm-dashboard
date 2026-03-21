@@ -46,7 +46,7 @@ import {
 } from '../services/quoteStore';
 import { formatCurrency } from '../utils/quoteCalculator';
 import { useAuth } from '../contexts/AuthContext';
-import { JobActual, CostLineItem, ActualStatus } from '../types/financials';
+import { JobActual, CostLineItem, ActualStatus, DailyHoursEntry } from '../types/financials';
 import { saveActual } from '../services/financialsStore';
 import type { Client } from '../types/fieldManagement';
 import type { Quote, Kit, KitSelection } from '../types/quote';
@@ -197,7 +197,9 @@ export default function ActualCreate() {
 
   // ─── Header state ──────────────────────────────────
   const [title, setTitle] = useState('');
-  const [jobDate, setJobDate] = useState(new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [endDate, setEndDate] = useState(new Date().toISOString().slice(0, 10));
+  const [dailyHours, setDailyHours] = useState<DailyHoursEntry[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
@@ -217,8 +219,6 @@ export default function ActualCreate() {
 
   // ─── Labour state ──────────────────────────────────
   const [pilotCount, setPilotCount] = useState(1);
-  const [pilotHours, setPilotHours] = useState(0);
-  const [pilotHoursStr, setPilotHoursStr] = useState('');
   const [pilotRate, setPilotRate] = useState(0);
   const [pilotRateStr, setPilotRateStr] = useState('');
   const [hasChemOp, setHasChemOp] = useState(false);
@@ -273,7 +273,10 @@ export default function ActualCreate() {
         if (prefill.quoteId) setSelectedQuoteId(prefill.quoteId);
         if (prefill.clientId) setSelectedClientId(prefill.clientId);
         if (prefill.title) setTitle(prefill.title);
-        if (prefill.jobDate) setJobDate(prefill.jobDate);
+        if (prefill.jobDate) {
+          setStartDate(prefill.jobDate);
+          setEndDate(prefill.jobDate);
+        }
         if (prefill.revenue) {
           setRevenue(prefill.revenue);
           setRevenueStr(String(prefill.revenue));
@@ -299,7 +302,10 @@ export default function ActualCreate() {
           setTitle(`${job.weedTarget} - ${client.name}`);
         }
       }
-      if (job.dateSprayed) setJobDate(job.dateSprayed);
+      if (job.dateSprayed) {
+        setStartDate(job.dateSprayed);
+        setEndDate(job.dateSprayed);
+      }
     },
     [],
   );
@@ -325,6 +331,42 @@ export default function ActualCreate() {
     [selectedQuoteId],
   );
 
+  // ─── Generate daily hours from date range ─────────
+  useEffect(() => {
+    if (!startDate || !endDate) return;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) {
+      setDailyHours([]);
+      return;
+    }
+    const entries: DailyHoursEntry[] = [];
+    const cursor = new Date(start);
+    while (cursor <= end) {
+      const dateStr = cursor.toISOString().slice(0, 10);
+      // Preserve existing hours for this date if already entered
+      const existing = dailyHours.find((d) => d.date === dateStr);
+      entries.push({ date: dateStr, hours: existing ? existing.hours : 0 });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    // Only update if the dates changed (avoid infinite loop)
+    const newDates = entries.map((e) => e.date).join(',');
+    const oldDates = dailyHours.map((e) => e.date).join(',');
+    if (newDates !== oldDates) {
+      setDailyHours(entries);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startDate, endDate]);
+
+  const totalDays = dailyHours.length;
+  const totalHours = dailyHours.reduce((sum, d) => sum + d.hours, 0);
+
+  const updateDailyHoursEntry = useCallback((date: string, hours: number) => {
+    setDailyHours((prev) =>
+      prev.map((d) => (d.date === date ? { ...d, hours } : d)),
+    );
+  }, []);
+
   // ─── Kit helpers ───────────────────────────────────
   const addKit = () => {
     if (allKits.length === 0) return;
@@ -345,7 +387,7 @@ export default function ActualCreate() {
 
   // ─── P&L Calculations ─────────────────────────────
   const calculations = useMemo(() => {
-    const labourPilots = pilotCount * pilotHours * pilotRate;
+    const labourPilots = pilotCount * totalHours * pilotRate;
     const labourChemOp = hasChemOp ? chemOpHours * chemOpRate : 0;
     const labourAdditional = additionalLabour.reduce((s, i) => s + i.amount, 0);
     const totalLabour = labourPilots + labourChemOp + labourAdditional;
@@ -376,7 +418,7 @@ export default function ActualCreate() {
       grossMarginPercent,
     };
   }, [
-    pilotCount, pilotHours, pilotRate,
+    pilotCount, totalHours, pilotRate,
     hasChemOp, chemOpHours, chemOpRate,
     additionalLabour, kilometres, vehicleCostPerKm,
     accommodation, meals, fuelTotal,
@@ -398,7 +440,11 @@ export default function ActualCreate() {
       quoteId: selectedQuoteId || undefined,
       clientId: selectedClientId || undefined,
       title,
-      jobDate,
+      startDate,
+      endDate,
+      dailyHours,
+      totalDays,
+      totalHours,
       status,
       revenue,
       revenueNotes,
@@ -410,7 +456,7 @@ export default function ActualCreate() {
       },
       labour: {
         pilotCount,
-        pilotHours,
+        pilotHours: totalHours,
         pilotRatePerHour: pilotRate,
         hasChemOperator: hasChemOp,
         chemOpHours,
@@ -489,16 +535,34 @@ export default function ActualCreate() {
               fullWidth
               placeholder="e.g. Blackberry Spray - Smith Farm"
             />
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
               <TextField
-                label="Job Date"
+                label="Start Date"
                 type="date"
-                value={jobDate}
-                onChange={(e) => setJobDate(e.target.value)}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
                 size="small"
                 InputLabelProps={{ shrink: true }}
-                sx={{ width: 180 }}
+                sx={{ width: 170 }}
               />
+              <TextField
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                sx={{ width: 170 }}
+              />
+              {totalDays > 0 && (
+                <Chip
+                  label={`${totalDays} day${totalDays !== 1 ? 's' : ''}`}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ fontWeight: 700 }}
+                />
+              )}
               <TextField
                 label="Status"
                 select
@@ -511,6 +575,68 @@ export default function ActualCreate() {
                 <MenuItem value="finalised">Finalised</MenuItem>
               </TextField>
             </Stack>
+
+            {/* Daily Hours Breakdown */}
+            {dailyHours.length > 0 && (
+              <Box
+                sx={{
+                  border: `1px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                  borderRadius: '12px',
+                  p: 2,
+                  bgcolor: alpha(theme.palette.primary.main, 0.02),
+                }}
+              >
+                <Typography variant="body2" fontWeight={700} color="primary.dark" sx={{ mb: 1.5 }}>
+                  Daily Hours
+                </Typography>
+                <Stack spacing={1}>
+                  {dailyHours.map((entry) => (
+                    <Stack
+                      key={entry.date}
+                      direction="row"
+                      spacing={2}
+                      alignItems="center"
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ minWidth: 140, fontWeight: 600 }}
+                      >
+                        {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-AU', {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                      </Typography>
+                      <TextField
+                        type="number"
+                        value={entry.hours || ''}
+                        onChange={(e) =>
+                          updateDailyHoursEntry(
+                            entry.date,
+                            Math.max(0, parseFloat(e.target.value) || 0),
+                          )
+                        }
+                        size="small"
+                        sx={{ width: 100 }}
+                        inputProps={{ min: 0, step: 0.5 }}
+                        placeholder="0"
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        hrs
+                      </Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1.5, pt: 1.5, borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.1)}` }}>
+                  <Typography variant="body2" fontWeight={700} sx={{ minWidth: 140 }}>
+                    Total
+                  </Typography>
+                  <Typography variant="body2" fontWeight={800} color="primary.main">
+                    {totalHours} hrs
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
 
             <Autocomplete
               options={allJobs}
@@ -702,15 +828,12 @@ export default function ActualCreate() {
                 inputProps={{ min: 0 }}
               />
               <TextField
-                label="Pilot Hours"
-                type="number"
-                value={pilotHoursStr}
-                onChange={(e) => {
-                  setPilotHoursStr(e.target.value);
-                  setPilotHours(parseFloat(e.target.value) || 0);
-                }}
+                label="Total Hours (from daily)"
+                value={`${totalHours} hrs`}
                 size="small"
-                sx={{ width: 130 }}
+                sx={{ width: 160 }}
+                slotProps={{ input: { readOnly: true } }}
+                helperText={totalDays > 0 ? `${totalDays} days` : undefined}
               />
               <TextField
                 label="Pilot Rate ($/hr)"
@@ -723,9 +846,9 @@ export default function ActualCreate() {
                 size="small"
                 sx={{ width: 140 }}
               />
-              {pilotCount > 0 && pilotHours > 0 && pilotRate > 0 && (
+              {pilotCount > 0 && totalHours > 0 && pilotRate > 0 && (
                 <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center' }}>
-                  = {formatCurrency(pilotCount * pilotHours * pilotRate)}
+                  = {formatCurrency(pilotCount * totalHours * pilotRate)}
                 </Typography>
               )}
             </Stack>

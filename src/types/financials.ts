@@ -48,6 +48,13 @@ export interface ActualOtherCosts {
   items: CostLineItem[];
 }
 
+// ─── Daily Hours Entry ──────────────────────────────────────
+
+export interface DailyHoursEntry {
+  date: string;   // ISO date e.g. '2026-03-17'
+  hours: number;
+}
+
 // ─── Job Actual ─────────────────────────────────────────────
 
 export type ActualStatus = 'draft' | 'finalised';
@@ -65,7 +72,11 @@ export interface JobActual {
 
   // Header
   title: string;
-  jobDate: string;
+  startDate: string;
+  endDate: string;
+  dailyHours: DailyHoursEntry[];
+  totalDays: number;
+  totalHours: number;
   status: ActualStatus;
 
   // Revenue

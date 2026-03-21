@@ -187,12 +187,19 @@ export default function ActualDetail() {
             />
           </Box>
           <Typography variant="body2" color="text.secondary">
-            {new Date(actual.jobDate).toLocaleDateString('en-AU', {
-              weekday: 'long',
+            {new Date(actual.startDate + 'T00:00:00').toLocaleDateString('en-AU', {
               day: 'numeric',
-              month: 'long',
+              month: 'short',
               year: 'numeric',
             })}
+            {actual.startDate !== actual.endDate && (
+              <> &ndash; {new Date(actual.endDate + 'T00:00:00').toLocaleDateString('en-AU', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+              })}</>
+            )}
+            {` \u2022 ${actual.totalDays} day${actual.totalDays !== 1 ? 's' : ''} \u2022 ${actual.totalHours} hrs`}
             {client ? ` \u2022 ${client.name}` : ''}
           </Typography>
         </Box>
@@ -330,6 +337,37 @@ export default function ActualDetail() {
             )}
           </CardContent>
         </Card>
+
+        {/* ─── Daily Hours ────────────────────────────────────── */}
+        {actual.dailyHours && actual.dailyHours.length > 1 && (
+          <Card elevation={0} sx={{ border: cardBorder, borderRadius: '16px' }}>
+            <CardContent sx={{ p: 3 }}>
+              <Typography variant="subtitle1" fontWeight={700} color="primary.dark" sx={{ mb: 2 }}>
+                Daily Hours ({actual.totalDays} days)
+              </Typography>
+              {actual.dailyHours.map((entry) => (
+                <Box key={entry.date} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    {new Date(entry.date + 'T00:00:00').toLocaleDateString('en-AU', {
+                      weekday: 'short',
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </Typography>
+                  <Typography variant="body2" fontWeight={600}>
+                    {entry.hours} hrs
+                  </Typography>
+                </Box>
+              ))}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1, mt: 1, borderTop: `1px solid ${alpha(theme.palette.primary.main, 0.1)}` }}>
+                <Typography variant="body2" fontWeight={700}>Total</Typography>
+                <Typography variant="body2" fontWeight={800} color="primary.main">
+                  {actual.totalHours} hrs
+                </Typography>
+              </Box>
+            </CardContent>
+          </Card>
+        )}
 
         {/* ─── Equipment ───────────────────────────────────────── */}
         <Card elevation={0} sx={{ border: cardBorder, borderRadius: '16px' }}>

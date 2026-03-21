@@ -49,7 +49,7 @@ export default function FinancialsList() {
   const actuals = useMemo(
     () =>
       getActuals(userId).sort(
-        (a, b) => b.jobDate.localeCompare(a.jobDate),
+        (a, b) => b.startDate.localeCompare(a.startDate),
       ),
     [userId],
   );
@@ -217,7 +217,10 @@ export default function FinancialsList() {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2">
-                        {new Date(actual.jobDate).toLocaleDateString('en-AU')}
+                        {new Date(actual.startDate + 'T00:00:00').toLocaleDateString('en-AU')}
+                        {actual.startDate !== actual.endDate && (
+                          <> &ndash; {new Date(actual.endDate + 'T00:00:00').toLocaleDateString('en-AU')}</>
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
